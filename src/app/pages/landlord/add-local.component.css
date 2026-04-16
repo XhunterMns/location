@@ -1,0 +1,167 @@
+.add-local-screen {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 23, 18, 0.45);
+}
+
+.add-local-modal {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  color: #0a0a0a;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  color: #0f3d2e;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.card-title h1 {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.card-title span {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-box label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.input-box input,
+.input-box textarea {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #080808;
+  font: inherit;
+}
+
+.input-box textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.input-box input::placeholder,
+.input-box textarea::placeholder {
+  color: rgba(8, 8, 8, 0.7);
+}
+
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.upload-box label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.upload-box input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.upload-box small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.upload-box .error-text {
+  color: #8a1111;
+  opacity: 1;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+button {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #0f3d2e;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #145c43;
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  background: rgba(16, 45, 35, 0.7);
+}
+
+.secondary-btn:hover {
+  background: rgba(12, 66, 48, 0.9);
+}
+
+@media (max-width: 640px) {
+  .add-local-screen {
+    padding: 16px;
+  }
+
+  .add-local-modal {
+    padding: 24px 18px;
+  }
+}

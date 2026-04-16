@@ -1,0 +1,47 @@
+<div class="signup-container">
+
+  <div class="signup-card" @fade>
+
+    <div class="card-title">
+      <h1>Create Account</h1>
+      <span>Already have an account?
+        <a routerLink="/login">Sign In</a>
+      </span>
+    </div>
+
+    <form class="form-group" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+
+      <div class="input-box">
+        <input type="text" name="name" placeholder="Name" formControlName="name">
+      </div>
+
+      <div class="input-box">
+        <input type="email" name="email" placeholder="Email" formControlName="email">
+      </div>
+
+      <div class="input-box">
+        <input type="password" name="password" placeholder="Password" formControlName="password">
+      </div>
+      <div>
+        <select formControlName="role">
+          <option value="" disabled>Select Role</option>
+          <option value="renter">Renter</option>
+          <option value="landlord">Landlord</option>
+        </select>
+      </div>
+
+      <button type="submit">Signup</button>
+
+    </form>
+
+    <div class="card-terms">
+      <label>
+        <input type="checkbox">
+        I have read and agree to the
+        <a href="#">Terms of Service</a>
+      </label>
+    </div>
+
+  </div>
+
+</div>

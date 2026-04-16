@@ -1,0 +1,101 @@
+.signup-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') no-repeat center;
+  background-size: cover;
+}
+
+/* Glass card */
+.signup-card {
+  width: 500px;
+  padding: 30px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  color: rgb(0, 0, 0);
+}
+
+/* Title */
+.card-title h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.card-title span {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.card-title a {
+  color: #161515;
+  font-weight: bold;
+}
+
+/* Inputs */
+.form-group {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px;
+
+  border: none;
+  outline: none;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.2);
+  color: rgb(8, 8, 8);
+}
+
+.input-box input::placeholder {
+  color: rgba(8, 8, 8, 0.7);
+}
+
+/* Button */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+
+  background: #0f3d2e;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #145c43;
+  transform: translateY(-2px);
+}
+
+/* Terms */
+.card-terms {
+  margin-top: 15px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-terms a {
+  color: #161515;
+  font-weight: bold;
+}

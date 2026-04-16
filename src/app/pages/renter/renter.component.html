@@ -1,0 +1,29 @@
+<div class="renter-container">
+    
+  <div class="renter-card" @fade>
+
+    <div class="card-title">
+      <h1>Renter Dashboard</h1>
+      <span>Browse and manage your rentals.</span>
+    </div>
+
+    <p>This is the renter dashboard. Here you can view available properties, manage your bookings, and update your profile.</p>
+
+  </div>
+</div>
+<div>
+
+</div>
+    <div class="locals-grid" *ngIf="locals.length; else emptyState">
+      <article class="local-card glass-card" *ngFor="let l of locals">
+        <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.titre" class="cover-image" />
+        <h3>{{ l.titre }}</h3>
+        <p class="address">{{ l.adresse }}</p>
+        <p class="price">{{ l.prix }} TND</p>
+
+        <div class="card-actions">
+          <button class="view-btn">View</button>
+          <button class="delete-btn">Delete</button>
+        </div>
+      </article>
+    </div>

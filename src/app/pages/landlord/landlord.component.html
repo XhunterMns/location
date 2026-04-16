@@ -1,0 +1,54 @@
+<div class="landlord-page">
+  <div class="page-overlay"></div>
+
+  <div class="landlord-content">
+    <div class="top-bar glass-card">
+      <div>
+        <h2>My Locals</h2>
+        <p>Manage your property listings in one place.</p>
+      </div>
+      <button class="add-btn" routerLink="/landlord/add">+ Add Local</button>
+    </div>
+
+    <div class="locals-grid" *ngIf="locals.length; else emptyState">
+      <article class="local-card glass-card" *ngFor="let l of locals">
+        <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.titre" class="cover-image" />
+        <h3>{{ l.titre }}</h3>
+        <p class="address">{{ l.adresse }}</p>
+        <p class="price">{{ l.prix }} TND</p>
+
+        <div class="card-actions">
+          <button class="view-btn" (click)="view(l)">View</button>
+          <button class="delete-btn" (click)="delete(l.id)">Delete</button>
+          <button class="edit-btn" routerLink="/landlord/edit/{{ l.id }}">Edit</button> <!--a modifie zid componenet mta3 edit-->
+        </div>
+      </article>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-state glass-card">
+        <h3>No locals yet</h3>
+        <p>Create your first listing to start managing rentals.</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="view-modal-wrap" *ngIf="selectedLocal">
+    <div class="modal-backdrop" (click)="closeView()"></div>
+    <section class="view-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="view-title">
+      <button class="close-btn" type="button" (click)="closeView()" aria-label="Close">x</button>
+      <h3 id="view-title">{{ selectedLocal.titre }}</h3>
+      <p><strong>Address:</strong> {{ selectedLocal.adresse }}</p>
+      <p><strong>Price:</strong> {{ selectedLocal.prix }} TND</p>
+      <p><strong>Description:</strong> {{ selectedLocal.description || 'No description provided.' }}</p>
+      <div class="images-block">
+        <p><strong>Images:</strong></p>
+        <p *ngIf="selectedLocal.imagesLoading">Loading images...</p>
+        <div class="images-grid" *ngIf="!selectedLocal.imagesLoading && selectedLocal.images?.length">
+          <img *ngFor="let img of selectedLocal.images" [src]="img.image_url" [alt]="selectedLocal.titre" class="detail-image" />
+        </div>
+        <p *ngIf="!selectedLocal.imagesLoading && !selectedLocal.images?.length">No images uploaded yet.</p>
+      </div>
+    </section>
+  </div>
+</div>

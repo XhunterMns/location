@@ -1,0 +1,35 @@
+<div class="login-container">
+
+  <div class="login-card" @fade>
+
+    <div class="card-title">
+      <h1>Login</h1>
+      <span>You don't have an account?
+        <a routerLink="/signup">Sign up</a>
+      </span>
+    </div>
+
+    <form class="form-group" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+      <div class="input-box">
+        <input name="email" type="email" formControlName="email" placeholder="Email">
+      </div>
+
+      <div class="input-box">
+        <input type="password" formControlName="password" placeholder="Password">
+      </div>
+
+      <div class="options">
+        <label>
+          <input type="checkbox"> Remember me
+        </label>
+        <a href="#">Forgot Password?</a>
+      </div>
+
+      <button type="submit">Login</button>
+
+    </form>
+
+  </div>
+
+</div>

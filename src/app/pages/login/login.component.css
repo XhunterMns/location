@@ -1,0 +1,97 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Glass card */
+.login-card {
+  width: 500px;
+  padding: 30px;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  color: rgb(0, 0, 0);
+}
+
+/* Title */
+.card-title h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+.card-title span {
+  display: block;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.card-title a {
+  color: #161515;
+  font-weight: bold;
+}
+
+/* Inputs */
+.form-group {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 12px;
+
+  border: none;
+  outline: none;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.2);
+  color: rgb(8, 8, 8);
+}
+
+.input-box input::placeholder {
+  color: rgba(8, 8, 8, 0.7);
+}
+
+/* Options */
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.options a {
+  color: rgb(14, 7, 7);
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+/* Button */
+button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+
+  background: #0f3d2e;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #145c43;
+  transform: translateY(-2px);
+}

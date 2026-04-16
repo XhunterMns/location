@@ -1,0 +1,16 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; 
+    background-color: rgba(253, 101, 133, 1);
+}
+
+button {
+    padding: 20px;
+    background-color: rgba(60, 10, 107, 0.562);
+    border-radius: 10px;
+    border: 0;
+    outline: none;
+    width: 300px;
+}
