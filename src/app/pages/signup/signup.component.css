@@ -51,7 +51,9 @@
   gap: 15px;
 }
 
-.input-box input {
+.input-box input,
+.input-box select,
+.select select {
   width: 100%;
   padding: 12px;
 
@@ -62,7 +64,6 @@
   background: rgba(255, 255, 255, 0.2);
   color: rgb(8, 8, 8);
 }
-
 .input-box input::placeholder {
   color: rgba(8, 8, 8, 0.7);
 }
@@ -98,4 +99,77 @@ button:hover {
 .card-terms a {
   color: #161515;
   font-weight: bold;
+}
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 24px;
+  margin: 10px;
+
+  border-radius: 16px;
+}
+
+/* logo */
+.logo {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f3d2e;
+}
+
+.logo span {
+  color: #1f7a5a;
+}
+
+/* right side */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  right: 40px;
+}
+
+/* links */
+.nav-right a {
+  text-decoration: none;
+  color: #0f3d2e;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.nav-right a:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* active link */
+.nav-right a.active {
+  background: #0f3d2e;
+  color: #fff;
+}
+
+/* logout button */
+.logout-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+
+  background: rgba(167, 25, 25, 0.85);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(136, 16, 16, 0.95);
+  transform: translateY(-2px);
 }

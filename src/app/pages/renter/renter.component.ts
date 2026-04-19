@@ -178,8 +178,5 @@ openView(local: any) {
   this.selectedLocal = local;
   this.currentImageIndex = 0;
 }
-logout() {
-  this.authService.logout();
-  this.router.navigate(['/login']);
-}
+
 }

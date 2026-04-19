@@ -1,11 +1,11 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet , CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   encapsulation: ViewEncapsulation.None
@@ -20,9 +20,8 @@ export class AppComponent {
     this.router.navigate(['/login']);
   }
 
-  // ✅ CLEAN WAY
-  get showLogout(): boolean {
-    const url = this.router.url;
-    return !url.includes('/login') && !url.includes('/signup');
+  showLogout(): boolean {
+    return !this.router.url.includes('/login') &&
+           !this.router.url.includes('/signup');
   }
 }

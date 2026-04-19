@@ -99,8 +99,5 @@ export class LandlordComponent {
   closeEdit() {
     this.editLocal = null;
   }
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+
 }
