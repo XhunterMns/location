@@ -99,17 +99,26 @@
       <div class="images-block">
         <p class="section-label">Gallery</p>
         <p *ngIf="selectedLocal.imagesLoading">Loading images...</p>
-        <div class="images-grid" *ngIf="!selectedLocal.imagesLoading && selectedLocal.images?.length">
-          <img
-            *ngFor="let image of selectedLocal.images"
-            [src]="image.image_url"
-            [alt]="selectedLocal.titre"
-            class="detail-image"
-          />
-        </div>
+        
         <p *ngIf="!selectedLocal.imagesLoading && !selectedLocal.images?.length">No images uploaded yet.</p>
       </div>
+<!-- ================= IMAGE SLIDER ================= -->
+<div class="image-slider" *ngIf="selectedLocal.images?.length">
 
+  <!-- LEFT ARROW -->
+  <button class="nav-btn left" (click)="prevImage()">‹</button>
+
+  <!-- IMAGE DISPLAY -->
+  <img
+    [src]="selectedLocal.images[currentImageIndex].image_url"
+    [alt]="selectedLocal.titre"
+    class="detail-image"
+  />
+
+  <!-- RIGHT ARROW -->
+  <button class="nav-btn right" (click)="nextImage()">›</button>
+
+</div>
       <div class="modal-sections">
         <form class="action-card" [formGroup]="reservationForm" (ngSubmit)="reserveSelectedLocal()">
           <h3>Reserve This Local</h3>

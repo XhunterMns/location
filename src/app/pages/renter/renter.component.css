@@ -330,7 +330,53 @@
   font-weight: bold;
   cursor: pointer;
 }
+.image-slider {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}
 
+.image-slider img {
+  width: 100%;
+  max-height: 500px;
+  height: 100%;
+  max-width: 500px;
+  object-fit: cover;
+  border-radius: 14px;
+  transition: 0.3s ease;
+}
+
+/* arrows */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  color: #0f3d2e;
+  transition: 0.2s;
+}
+
+.nav-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-btn.left {
+  left: 10px;
+}
+
+.nav-btn.right {
+  right: 10px;
+}
 @media (max-width: 768px) {
   .hero-card,
   .section-heading,

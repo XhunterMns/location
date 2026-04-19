@@ -138,6 +138,9 @@ export class RenterComponent {
       note: Number(this.evaluationForm.getRawValue().note),
       commentaire: this.evaluationForm.getRawValue().commentaire.trim()
     };
+
+
+    
     
 
     this.renterService.evaluateLocal(payload).subscribe({
@@ -150,4 +153,26 @@ export class RenterComponent {
       }
     });
   }
+  currentImageIndex = 0;
+
+// next image
+nextImage() {
+  if (!this.selectedLocal?.images?.length) return;
+  this.currentImageIndex =
+    (this.currentImageIndex + 1) % this.selectedLocal.images.length;
+}
+
+// previous image
+prevImage() {
+  if (!this.selectedLocal?.images?.length) return;
+  this.currentImageIndex =
+    (this.currentImageIndex - 1 + this.selectedLocal.images.length) %
+    this.selectedLocal.images.length;
+}
+
+// reset when opening modal
+openView(local: any) {
+  this.selectedLocal = local;
+  this.currentImageIndex = 0;
+}
 }
