@@ -201,7 +201,7 @@ app.post('/login', (req, res) => {
 // Create local
 app.post('/locals', verifyToken, isLandlord, (req, res) => {
   const { titre, adresse, description, prix, disponibilite } = req.body;
-  const sql = 'INSERT INTO locals (titre, adresse, git, prix, disponibilite, user_id) VALUES (?, ?, ?, ?, ?, ?)';
+  const sql = 'INSERT INTO locals (titre, adresse, description, prix, disponibilite, user_id) VALUES (?, ?, ?, ?, ?, ?)';
   db.query(sql, [titre, adresse, description, prix, disponibilite ? 1 : 1, req.user.id], (err, result) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
     return res.json({ message: 'Local created', id: result.insertId });
@@ -265,6 +265,11 @@ app.put('/locals/:id', verifyToken, isLandlord, (req, res) => {
 
 // Delete local
 app.delete('/locals/:id', verifyToken, isLandlord, (req, res) => {
+  const localId = req.params.id;
+
+  db.query('DELETE FROM evaluations WHERE local_id = ?', [localId]);
+  db.query('DELETE FROM reservations WHERE local_id = ?', [localId]);
+  db.query('DELETE FROM local_images WHERE local_id = ?', [localId]);
   const sql = 'DELETE FROM locals WHERE id=? AND user_id=?';
   db.query(sql, [req.params.id, req.user.id], (err, result) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
