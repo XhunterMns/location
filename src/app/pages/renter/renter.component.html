@@ -1,29 +1,148 @@
-<div class="renter-container">
-    
-  <div class="renter-card" @fade>
+<div class="renter-page">
+  <div class="page-overlay"></div>
 
-    <div class="card-title">
-      <h1>Renter Dashboard</h1>
-      <span>Browse and manage your rentals.</span>
-    </div>
+  <div class="renter-content">
+    <section class="hero-card glass-card">
+      <div>
+        <h1>Renter Dashboard</h1>
+        <p>Reserve a local and leave an evaluation after your stay.</p>
+      </div>
+      <div class="stats-chip">
+        <strong>{{ locals.length }}</strong>
+        <span>available locals</span>
+      </div>
+    </section>
 
-    <p>This is the renter dashboard. Here you can view available properties, manage your bookings, and update your profile.</p>
+    <section class="glass-card reservations-panel">
+      <div class="section-heading">
+        <h2>My Reservations</h2>
+        <span>{{ reservations.length }} total</span>
+      </div>
 
-  </div>
-</div>
-<div>
+      <p class="error-message" *ngIf="reservationsError">{{ reservationsError }}</p>
 
-</div>
-    <div class="locals-grid" *ngIf="locals.length; else emptyState">
-      <article class="local-card glass-card" *ngFor="let l of locals">
-        <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.titre" class="cover-image" />
-        <h3>{{ l.titre }}</h3>
-        <p class="address">{{ l.adresse }}</p>
-        <p class="price">{{ l.prix }} TND</p>
+      <div class="reservations-list" *ngIf="!reservationsError && reservations.length; else noReservations">
+        <article class="reservation-item" *ngFor="let reservation of reservations">
+          <img *ngIf="reservation.cover_image" [src]="reservation.cover_image" [alt]="reservation.titre" class="reservation-image" />
+          <div class="reservation-copy">
+            <h3>{{ reservation.titre }}</h3>
+            <p>{{ reservation.adresse }}</p>
+            <p>
+              {{ reservation.start_date | date:'mediumDate' }} to
+              {{ reservation.end_date | date:'mediumDate' }}
+            </p>
+          </div>
+          <span class="status-pill">{{ reservation.status }}</span>
+         
+        </article>
+      </div>
+    </section>
 
-        <div class="card-actions">
-          <button class="view-btn">View</button>
-          <button class="delete-btn">Delete</button>
+    <p class="error-message" *ngIf="pageError">{{ pageError }}</p>
+    <p class="loading-copy" *ngIf="loading">Loading locals...</p>
+
+    <div class="locals-grid" *ngIf="!loading && !pageError && locals.length; else emptyState">
+      <article class="local-card glass-card" *ngFor="let local of locals">
+        <img *ngIf="local.cover_image" [src]="local.cover_image" [alt]="local.titre" class="cover-image" />
+        <div class="local-copy">
+          <h3>{{ local.titre }}</h3>
+          <p>{{ local.adresse }}</p>
+          <p class="landlord-name">Owner: {{ local.landlord_name || 'Unknown' }}</p>
+          <p class="price">{{ local.prix }} TND</p>
+          <p class="evaluation">
+            ⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : '0.0' }}
+            ({{ local.total_reviews || 0 }} reviews)
+          </p>
         </div>
+        <button class="view-btn" type="button" (click)="view(local)">Reserve / Evaluate</button>
       </article>
     </div>
+
+    <ng-template #emptyState>
+      <section class="glass-card empty-state" *ngIf="!pageError">
+        <h3>No locals available right now</h3>
+        <p>Check back later for new places to reserve.</p>
+      </section>
+    </ng-template>
+
+    <ng-template #noReservations>
+      <p class="muted-copy" *ngIf="!reservationsError">You have not reserved any local yet.</p>
+    </ng-template>
+  </div>
+
+  <div class="view-modal-wrap" *ngIf="selectedLocal">
+    <div class="modal-backdrop" (click)="closeView()"></div>
+
+    <section class="view-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="local-title">
+      <button class="close-btn" type="button" (click)="closeView()" aria-label="Close">x</button>
+
+      <div class="modal-header">
+        <div>
+          <h2 id="local-title">{{ selectedLocal.titre }}</h2>
+          <p>{{ selectedLocal.adresse }}</p>
+        </div>
+        <p class="modal-price">{{ selectedLocal.prix }} TND</p>
+      </div>
+
+      <p class="modal-description">
+        {{ selectedLocal.description || 'No description provided for this local yet.' }}
+      </p>
+
+      <div class="images-block">
+        <p class="section-label">Gallery</p>
+        <p *ngIf="selectedLocal.imagesLoading">Loading images...</p>
+        <div class="images-grid" *ngIf="!selectedLocal.imagesLoading && selectedLocal.images?.length">
+          <img
+            *ngFor="let image of selectedLocal.images"
+            [src]="image.image_url"
+            [alt]="selectedLocal.titre"
+            class="detail-image"
+          />
+        </div>
+        <p *ngIf="!selectedLocal.imagesLoading && !selectedLocal.images?.length">No images uploaded yet.</p>
+      </div>
+
+      <div class="modal-sections">
+        <form class="action-card" [formGroup]="reservationForm" (ngSubmit)="reserveSelectedLocal()">
+          <h3>Reserve This Local</h3>
+
+          <label>
+            <span>Start date</span>
+            <input type="date" formControlName="start_date" />
+          </label>
+
+          <label>
+            <span>End date</span>
+            <input type="date" formControlName="end_date" />
+          </label>
+
+          <button type="submit" class="primary-btn">Reserve</button>
+          <p class="feedback-message" *ngIf="reservationMessage">{{ reservationMessage }}</p>
+        </form>
+
+        <form class="action-card" [formGroup]="evaluationForm" (ngSubmit)="evaluateSelectedLocal()">
+          <h3>Evaluate This Local</h3>
+
+          <label>
+            <span>Rating</span>
+            <select formControlName="note">
+              <option [value]="5">5 - Excellent</option>
+              <option [value]="4">4 - Very good</option>
+              <option [value]="3">3 - Good</option>
+              <option [value]="2">2 - Fair</option>
+              <option [value]="1">1 - Poor</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Comment</span>
+            <textarea rows="4" formControlName="commentaire" placeholder="Share your experience"></textarea>
+          </label>
+
+          <button type="submit" class="secondary-btn">Save Evaluation</button>
+          <p class="feedback-message" *ngIf="evaluationMessage">{{ evaluationMessage }}</p>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { LandlordService } from '../../users/landlord.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -15,9 +16,10 @@ export class LandlordComponent {
   locals: any[] = [];
   selectedLocal: any | null = null;
 
-  constructor(private service: LandlordService) {}
+  constructor(private service: LandlordService, @Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
+    if (!isPlatformBrowser(this.platformId)) return;
     this.loadLocals();
   }
   

@@ -16,11 +16,16 @@
         <h3>{{ l.titre }}</h3>
         <p class="address">{{ l.adresse }}</p>
         <p class="price">{{ l.prix }} TND</p>
+        <p class="evaluation">
+          ⭐ {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }}
+          ({{ l.total_reviews }} reviews)
+        </p>
 
         <div class="card-actions">
           <button class="view-btn" (click)="view(l)">View</button>
           <button class="delete-btn" (click)="delete(l.id)">Delete</button>
-          <button class="edit-btn" routerLink="/landlord/edit/{{ l.id }}">Edit</button> <!--a modifie zid componenet mta3 edit-->
+          <button class="edit-btn" routerLink="/landlord/edit/{{ l.id }}">Edit</button>
+          <!--a modifie zid componenet mta3 edit-->
         </div>
       </article>
     </div>
@@ -45,7 +50,8 @@
         <p><strong>Images:</strong></p>
         <p *ngIf="selectedLocal.imagesLoading">Loading images...</p>
         <div class="images-grid" *ngIf="!selectedLocal.imagesLoading && selectedLocal.images?.length">
-          <img *ngFor="let img of selectedLocal.images" [src]="img.image_url" [alt]="selectedLocal.titre" class="detail-image" />
+          <img *ngFor="let img of selectedLocal.images" [src]="img.image_url" [alt]="selectedLocal.titre"
+            class="detail-image" />
         </div>
         <p *ngIf="!selectedLocal.imagesLoading && !selectedLocal.images?.length">No images uploaded yet.</p>
       </div>

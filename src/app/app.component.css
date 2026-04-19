@@ -1,0 +1,39 @@
+:root {
+  --app-font-family: "Poppins", sans-serif;
+  --app-bg-image: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--app-font-family);
+  background: var(--app-bg-image) no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  
+}
+
+
+.logoutbutton {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  background: #0f3d2e;
+  color: white;
+  cursor: pointer;
+  }
