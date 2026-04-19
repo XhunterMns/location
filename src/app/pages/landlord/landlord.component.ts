@@ -3,11 +3,12 @@ import { isPlatformBrowser } from '@angular/common';
 import { LandlordService } from '../../users/landlord.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-landlord',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './landlord.component.html',
   styleUrls: ['./landlord.component.css']
 })
@@ -15,15 +16,16 @@ export class LandlordComponent {
 
   locals: any[] = [];
   selectedLocal: any | null = null;
+  editLocal: any = null;
 
-  constructor(private service: LandlordService, @Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(private service: LandlordService, @Inject(PLATFORM_ID) private platformId: Object) { }
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     this.loadLocals();
   }
-  
-   
+
+
 
   loadLocals() {
     this.service.getMyLocals().subscribe((res: any) => {
@@ -52,9 +54,46 @@ export class LandlordComponent {
       }
     });
   }
+  update(local: any) {
+    this.editLocal = { ...local };
+    this.selectedLocal = { ...local, images: [], imagesLoading: true };
+    this.service.updateLocal(local.id, local).subscribe(() => {
+      this.loadLocals();
+    });
+  }
+  saveEdit() {
+    this.service.updateLocal(this.editLocal.id, this.editLocal)
+      .subscribe(() => {
+        this.loadLocals();
+        this.closeView();
+      });
+  }
+  currentImageIndex = 0;
 
+  // next image
+  nextImage() {
+    if (!this.selectedLocal?.images?.length) return;
+    this.currentImageIndex =
+      (this.currentImageIndex + 1) % this.selectedLocal.images.length;
+  }
+
+  // previous image
+  prevImage() {
+    if (!this.selectedLocal?.images?.length) return;
+    this.currentImageIndex =
+      (this.currentImageIndex - 1 + this.selectedLocal.images.length) %
+      this.selectedLocal.images.length;
+  }
+
+  // reset when opening modal
+  openView(local: any) {
+    this.selectedLocal = local;
+    this.currentImageIndex = 0;
+  }
   closeView() {
     this.selectedLocal = null;
   }
-
+  closeEdit() {
+    this.editLocal = null;
+  }
 }

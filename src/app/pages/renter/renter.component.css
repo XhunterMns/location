@@ -284,6 +284,52 @@
 .loading-copy {
   color: #475569;
 }
+/* ================= IMAGE ZOOM MODAL ================= */
+
+.image-zoom-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.zoom-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.zoom-box {
+  position: relative;
+  z-index: 2;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.zoom-box img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  transform: scale(1);
+  transition: 0.3s ease;
+}
+
+.zoom-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: #0f3d2e;
+  font-weight: bold;
+  cursor: pointer;
+}
 
 @media (max-width: 768px) {
   .hero-card,
@@ -298,4 +344,5 @@
   .view-modal-wrap {
     padding: 12px;
   }
+  
 }

@@ -35,6 +35,7 @@
                 <small *ngIf="selectedFiles.length">{{ selectedFiles.length }} image(s) selected</small>
                 <small *ngIf="uploadError" class="error-text">{{ uploadError }}</small>
             </div>
+            
             <div class="actions">
                 <button type="button" class="secondary-btn" (click)="close()">Cancel</button>
                 <button type="submit">Create</button>

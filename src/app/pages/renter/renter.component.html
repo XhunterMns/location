@@ -23,7 +23,11 @@
 
       <div class="reservations-list" *ngIf="!reservationsError && reservations.length; else noReservations">
         <article class="reservation-item" *ngFor="let reservation of reservations">
-          <img *ngIf="reservation.cover_image" [src]="reservation.cover_image" [alt]="reservation.titre" class="reservation-image" />
+          <img *ngIf="reservation.cover_image"
+          [src]="reservation.cover_image"
+          [alt]="reservation.titre"
+          class="reservation-image"
+          (click)="openZoom(reservation.cover_image)" />
           <div class="reservation-copy">
             <h3>{{ reservation.titre }}</h3>
             <p>{{ reservation.adresse }}</p>
@@ -43,8 +47,12 @@
 
     <div class="locals-grid" *ngIf="!loading && !pageError && locals.length; else emptyState">
       <article class="local-card glass-card" *ngFor="let local of locals">
-        <img *ngIf="local.cover_image" [src]="local.cover_image" [alt]="local.titre" class="cover-image" />
-        <div class="local-copy">
+<!-- CLICK IMAGE TO ZOOM -->
+<img *ngIf="local.cover_image"
+     [src]="local.cover_image"
+     [alt]="local.titre"
+     class="cover-image"
+     (click)="openZoom(local.cover_image)" />        <div class="local-copy">
           <h3>{{ local.titre }}</h3>
           <p>{{ local.adresse }}</p>
           <p class="landlord-name">Owner: {{ local.landlord_name || 'Unknown' }}</p>
@@ -145,4 +153,20 @@
       </div>
     </section>
   </div>
+  <!-- ================= IMAGE ZOOM MODAL ================= -->
+<!-- This modal shows clicked image in full screen -->
+
+<div class="image-zoom-wrap" *ngIf="zoomImage">
+  <!-- dark background -->
+  <div class="zoom-backdrop" (click)="closeZoom()"></div>
+
+  <!-- zoomed image container -->
+  <div class="zoom-box">
+    <!-- close button -->
+    <button class="zoom-close" (click)="closeZoom()">x</button>
+
+    <!-- big image -->
+    <img [src]="zoomImage" alt="Zoomed image" />
+  </div>
+</div>
 </div>

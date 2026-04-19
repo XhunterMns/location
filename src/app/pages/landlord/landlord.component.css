@@ -158,29 +158,35 @@ button {
 .view-modal {
   position: relative;
   width: 100%;
-  max-width: 520px;
+  max-width: 720px;
   padding: 24px;
   z-index: 1;
 }
 
 .view-modal h3 {
-  margin: 0 28px 14px 0;
+  margin: 0 60px 60px 0;
+  font-size: 40px;
+  text-shadow: #471414 1px 1px 1px;
+  text-decoration: double;
 }
 
 .view-modal p {
-  margin: 0 0 10px;
+  margin: 0 0 40px;
+  text-shadow: #471414 1px 1px 1px;
+  text-decoration: double;
+  color: bisque;
 }
 
 .images-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 20px;
 }
 
 .detail-image {
   width: 100%;
-  height: 100px;
+  height: 500px;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -196,7 +202,82 @@ button {
   background: rgba(255, 255, 255, 0.35);
   color: #0f3d2e;
 }
+.view-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+}
 
+.view-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.view-modal input,
+.view-modal textarea,
+.view-modal select {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.25);
+  color: #080808;
+}
+
+.view-modal textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.image-slider {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.image-slider img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: 14px;
+  transition: 0.3s ease;
+}
+
+/* arrows */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.8);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  color: #0f3d2e;
+  transition: 0.2s;
+}
+
+.nav-btn:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-btn.left {
+  left: 10px;
+}
+
+.nav-btn.right {
+  right: 10px;
+}
 @media (max-width: 700px) {
   .top-bar {
     flex-direction: column;

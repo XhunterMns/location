@@ -93,7 +93,17 @@ export class RenterComponent {
     this.reservationMessage = '';
     this.evaluationMessage = '';
   }
+  zoomImage: string | null = null;
 
+  // open image in modal
+  openZoom(img: string) {
+    this.zoomImage = img;
+  }
+  
+  // close modal
+  closeZoom() {
+    this.zoomImage = null;
+  }
   reserveSelectedLocal() {
     if (!this.selectedLocal || this.reservationForm.invalid) {
       this.reservationForm.markAllAsTouched();
