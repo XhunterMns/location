@@ -1,7 +1,9 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RenterService } from '../../users/renter.service';
+import { Router } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-renter',
@@ -19,7 +21,8 @@ export class RenterComponent {
   reservationsError = '';
   reservationMessage = '';
   evaluationMessage = '';
-
+  authService = inject(AuthService);
+  router = inject(Router);
   reservationForm = new FormGroup({
     start_date: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     end_date: new FormControl('', { nonNullable: true, validators: [Validators.required] })
@@ -174,5 +177,9 @@ prevImage() {
 openView(local: any) {
   this.selectedLocal = local;
   this.currentImageIndex = 0;
+}
+logout() {
+  this.authService.logout();
+  this.router.navigate(['/login']);
 }
 }

@@ -1,9 +1,10 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { LandlordService } from '../../users/landlord.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-landlord',
@@ -17,6 +18,8 @@ export class LandlordComponent {
   locals: any[] = [];
   selectedLocal: any | null = null;
   editLocal: any = null;
+  authService = inject(AuthService);
+  router = inject(Router);
 
   constructor(private service: LandlordService, @Inject(PLATFORM_ID) private platformId: Object) { }
 
@@ -95,5 +98,9 @@ export class LandlordComponent {
   }
   closeEdit() {
     this.editLocal = null;
+  }
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }

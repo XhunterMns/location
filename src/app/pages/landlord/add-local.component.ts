@@ -91,4 +91,5 @@ export class AddLocalComponent {
   close() {
     this.router.navigate(['/landlord']);
   }
+  
 }

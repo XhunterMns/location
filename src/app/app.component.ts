@@ -11,7 +11,7 @@ import { AuthService } from './auth/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
-  title = 'location';
+
   authService = inject(AuthService);
   router = inject(Router);
 
@@ -19,9 +19,10 @@ export class AppComponent {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
-showLogout(): boolean {
-  const currentUrl = this.router.url;
 
-  return currentUrl !== '/login' && currentUrl !== '/signup';
-}
+  // ✅ CLEAN WAY
+  get showLogout(): boolean {
+    const url = this.router.url;
+    return !url.includes('/login') && !url.includes('/signup');
+  }
 }
