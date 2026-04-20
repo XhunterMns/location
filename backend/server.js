@@ -251,6 +251,15 @@ app.get('/locals/my', verifyToken, isLandlord, (req, res) => {
   });
 });
 
+//delete reservation
+app.delete('/reservations/:id', verifyToken, isRenter, (req, res) => {
+  const reservationId = req.params.id;
+
+  db.query('DELETE FROM reservations WHERE id = ?', [reservationId], (err, result) => {
+    if (err) return res.status(500).json({ message: 'DB error', err });
+    return res.json({ message: 'Reservation deleted', count: result.affectedRows });
+  });
+});
 
 // Update local
 app.put('/locals/:id', verifyToken, isLandlord, (req, res) => {
