@@ -34,4 +34,8 @@ export class RenterService {
   evaluateLocal(data: { local_id: number; note: number; commentaire?: string }) {
     return this.http.post(`${this.baseUrl}/evaluations`, data, this.authHeaders());
   }
+
+  deleteReservation(id: number) {
+    return this.http.delete(`${this.baseUrl}/reservations/${id}`, this.authHeaders());
+  }
 }

@@ -37,7 +37,10 @@
             </p>
           </div>
           <span class="status-pill">{{ reservation.status }}</span>
-         
+          <div class="button-group">
+            <button class="pay-btn">Pay</button>
+            <button class="delete-btn" (click)="delete(reservation.id)">Delete</button>
+          </div>
         </article>
       </div>
     </section>

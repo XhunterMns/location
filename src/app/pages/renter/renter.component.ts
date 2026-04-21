@@ -157,6 +157,13 @@ export class RenterComponent {
     });
   }
   currentImageIndex = 0;
+  //cancel reservation
+  delete(id: number) {  
+    this.renterService.deleteReservation(id).subscribe(() => {
+      this.loadDashboard();
+    });
+  }
+
 
 // next image
 nextImage() {
