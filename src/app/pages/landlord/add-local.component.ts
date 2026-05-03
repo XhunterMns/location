@@ -21,10 +21,10 @@ export class AddLocalComponent {
   private readonly maxFilesPerUpload = 6;
 
   public localForm = new FormGroup({
-    titre: new FormControl('', [Validators.required]),
-    adresse: new FormControl('', [Validators.required]),
+    title: new FormControl('', [Validators.required]),
+    address: new FormControl('', [Validators.required]),
     description: new FormControl('', []),
-    prix: new FormControl(0, [Validators.required])
+    price: new FormControl(0, [Validators.required])
   });
 
   async submit() {

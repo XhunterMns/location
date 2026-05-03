@@ -54,22 +54,30 @@
 
 /* PAY button (success / green theme) */
 .pay-btn {
-  background: rgba(15, 61, 46, 0.9);
+  background: rgba(15, 61, 46, 0.1);
+  color: #0f3d2e;
+  border: 1px solid rgba(15, 61, 46, 0.2);
 }
 
 .pay-btn:hover {
-  background: #145c43;
+  background: #0f3d2e;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 61, 46, 0.2);
 }
 
 /* DELETE button (danger / red theme) */
 .delete-btn {
-  background: rgba(167, 25, 25, 0.88);
+  background: rgba(167, 25, 25, 0.1);
+  color: #a71919;
+  border: 1px solid rgba(167, 25, 25, 0.2);
 }
 
 .delete-btn:hover {
-  background: rgba(136, 16, 16, 0.95);
+  background: #a71919;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(167, 25, 25, 0.2);
 }
 
 /* optional: active click effect */
@@ -228,11 +236,28 @@
 .primary-btn {
   background: #0f172a;
   color: #fff;
+  border: 1px solid transparent;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+}
+
+.view-btn:hover,
+.primary-btn:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
 }
 
 .secondary-btn {
-  background: #ccfbf1;
+  background: rgba(20, 184, 166, 0.1);
   color: #134e4a;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+.secondary-btn:hover {
+  background: #14b8a6;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.2);
 }
 
 .view-btn:hover,

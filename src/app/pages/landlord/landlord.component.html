@@ -7,24 +7,30 @@
         <h2>My Locals</h2>
         <p>Manage your property listings in one place.</p>
       </div>
-      <button class="add-btn" routerLink="/landlord/add">+ Add Local</button>
+      <button class="add-btn glass-card" routerLink="/landlord/add">+ Add Local</button>
     </div>
 
     <div class="locals-grid" *ngIf="locals.length; else emptyState">
       <article class="local-card glass-card" *ngFor="let l of locals">
-        <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.titre" class="cover-image" />
-        <h3>{{ l.titre }}</h3>
-        <p class="address">{{ l.adresse }}</p>
-        <p class="price">{{ l.prix }} TND</p>
+        <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.title" class="cover-image" />
+        <h3>{{ l.title }}</h3>
+        <p class="address">{{ l.address }}</p>
+        <p class="price">{{ l.price }} TND</p>
+        <p class="status">
+          Status: 
+          <span class="status-badge" [ngClass]="l.is_reserved ? 'reserved' : l.status">
+            {{ l.is_reserved ? 'reserved' : (l.status || 'pending') }}
+          </span>
+        </p>
         <p class="evaluation">
           ⭐ {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }}
           ({{ l.total_reviews }} reviews)
         </p>
 
         <div class="card-actions">
-          <button class="view-btn" (click)="view(l)">View</button>
-          <button class="delete-btn" (click)="delete(l.id)">Delete</button>
-          <button class="edit-btn" (click)="update(l)">Edit</button>
+          <button class="view-btn" (click)="view(l)" title="View Details">👁️ View</button>
+          <button class="edit-btn" (click)="update(l)" title="Edit Local">✏️ Edit</button>
+          <button class="delete-btn" (click)="delete(l.id)" title="Delete Local">🗑️ Delete</button>
         </div>
       </article>
     </div>
@@ -40,12 +46,13 @@
   <div class="modal-backdrop" (click)="closeView()"></div>
   <div class="view-modal glass-card">
     <button class="close-btn" type="button" (click)="closeView()">x</button>
-    <h3>{{ selectedLocal.titre }}</h3>
-    <p>{{ selectedLocal.adresse }}</p>
+    <h3>{{ selectedLocal.title }}</h3>
+    <p>{{ selectedLocal.address }}</p>
     <p>{{ selectedLocal.description }}</p>
-    <p>{{ selectedLocal.prix }} TND</p>
-    <p *ngIf="selectedLocal.disponibilite === 1">Available</p>
-    <p *ngIf="selectedLocal.disponibilite === 0">Not Available</p>
+    <p>{{ selectedLocal.price }} TND</p>
+    <p *ngIf="selectedLocal.is_reserved">Reserved</p>
+    <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 1">Available</p>
+    <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 0">Not Available</p>
 
     <div class="images-grid">
      <!-- ================= IMAGE SLIDER ================= -->
@@ -57,7 +64,7 @@
   <!-- IMAGE DISPLAY -->
   <img
     [src]="selectedLocal.images[currentImageIndex].image_url"
-    [alt]="selectedLocal.titre"
+    [alt]="selectedLocal.title"
     class="detail-image"
   />
 
@@ -81,12 +88,12 @@
 
         <label>
           Title
-          <input type="text" [(ngModel)]="editLocal.titre" name="titre" />
+          <input type="text" [(ngModel)]="editLocal.title" name="title" />
         </label>
 
         <label>
           Address
-          <input type="text" [(ngModel)]="editLocal.adresse" name="adresse" />
+          <input type="text" [(ngModel)]="editLocal.address" name="address" />
         </label>
 
         <label>
@@ -96,12 +103,12 @@
 
         <label>
           Price
-          <input type="number" [(ngModel)]="editLocal.prix" name="prix" />
+          <input type="number" [(ngModel)]="editLocal.price" name="price" />
         </label>
 
         <label>
           Availability
-          <select [(ngModel)]="editLocal.disponibilite" name="disponibilite">
+          <select [(ngModel)]="editLocal.availability" name="availability">
             <option [ngValue]="1">Available</option>
             <option [ngValue]="0">Not Available</option>
           </select>

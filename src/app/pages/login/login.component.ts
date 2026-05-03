@@ -34,7 +34,7 @@ export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
   protected loginForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    email: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required])
   })
 
@@ -56,6 +56,8 @@ export class LoginComponent {
           }
           else if (role === 'landlord') {
             this.router.navigate(['/landlord']);
+          } else if (role === 'admin') {
+            this.router.navigate(['/admin']);
           } else {
             console.log("UNKNOWN ROLE:", role);
           }

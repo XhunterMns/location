@@ -41,6 +41,37 @@ function ensureTable(sql, label) {
   });
 }
 
+function ensureLocalsTable() {
+  return ensureTable(
+    `
+      CREATE TABLE IF NOT EXISTS locals (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        address VARCHAR(255) NOT NULL,
+        description TEXT,
+        price DECIMAL(10,2) NOT NULL,
+        availability TINYINT(1) DEFAULT 1,
+        user_id INT NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_user_id (user_id)
+      )
+    `,
+    'locals'
+  ).then(() => {
+    // Also ensure status column exists if table was already there
+    return new Promise((resolve) => {
+      db.query("SHOW COLUMNS FROM locals LIKE 'status'", (err, rows) => {
+        if (!err && rows.length === 0) {
+          db.query("ALTER TABLE locals ADD COLUMN status VARCHAR(20) DEFAULT 'pending'", () => resolve());
+        } else {
+          resolve();
+        }
+      });
+    });
+  });
+}
+
 function ensureLocalImagesTable() {
   return ensureTable(
     `
@@ -61,9 +92,9 @@ function ensureReservationsTable() {
     `
       CREATE TABLE IF NOT EXISTS reservations (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        dateDebut DATE NOT NULL,
-        dateFin DATE NOT NULL,
-        statut VARCHAR(50) DEFAULT 'reserved',
+        startDate DATE NOT NULL,
+        endDate DATE NOT NULL,
+        status VARCHAR(50) DEFAULT 'reserved',
         user_id INT NOT NULL,
         local_id INT NOT NULL,
         INDEX idx_reservations_local_id (local_id),
@@ -81,8 +112,8 @@ function ensureEvaluationsTable() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         local_id INT NOT NULL,
         renter_id INT NOT NULL,
-        note INT NOT NULL,
-        commentaire TEXT NULL,
+        rating INT NOT NULL,
+        comment TEXT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY unique_local_renter (local_id, renter_id),
@@ -157,9 +188,15 @@ function isRenter(req, res, next) {
   next();
 }
 
+function isAdmin(req, res, next) {
+  const role = normalizeRole(req.user?.role);
+  if (role !== 'admin') return res.status(403).json({ message: 'Access denied' });
+  next();
+}
+
 // ---------- Auth routes ----------
 app.post('/register', async (req, res) => {
-  const { nom, email, password, role } = req.body;
+  const { name, email, password, role } = req.body;
   const normalizedRole = normalizeRole(role);
   if (!email || !password || !normalizedRole) return res.status(400).json({ message: 'Missing fields' });
   if (!['landlord', 'renter'].includes(normalizedRole)) {
@@ -168,8 +205,8 @@ app.post('/register', async (req, res) => {
 
   try {
     const hashed = await bcrypt.hash(password, 10);
-    const sql = 'INSERT INTO users (nom, email, password, role) VALUES (?, ?, ?, ?)';
-    db.query(sql, [nom || null, email, hashed, normalizedRole], (err, result) => {
+    const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
+    db.query(sql, [name || null, email, hashed, normalizedRole], (err, result) => {
       if (err) return res.status(500).json({ message: 'DB error', err });
       return res.json({ message: 'User created', id: result.insertId });
     });
@@ -185,6 +222,26 @@ app.post('/login', (req, res) => {
   const sql = 'SELECT * FROM users WHERE email = ? LIMIT 1';
   db.query(sql, [email], async (err, results) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
+
+    // --- EMERGENCY ADMIN AUTO-CREATION ---
+    // If login is "admin/admin" and user not found, create it on the fly
+    if ((!results || results.length === 0) && email === 'admin' && password === 'admin') {
+      try {
+        const hashed = await bcrypt.hash('admin', 10);
+        const insertSql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
+        db.query(insertSql, ['admin', 'admin', hashed, 'admin'], (insErr, insRes) => {
+          if (insErr) return res.status(500).json({ message: 'Error creating admin', insErr });
+          
+          // Now log them in immediately
+          const token = jwt.sign({ id: insRes.insertId, role: 'admin' }, JWT_SECRET, { expiresIn: '1h' });
+          return res.json({ token, role: 'admin' });
+        });
+        return; // Wait for async query
+      } catch (e) {
+        return res.status(500).json({ message: 'Server error during admin setup' });
+      }
+    }
+
     if (!results || results.length === 0) return res.status(401).json({ message: 'User not found' });
 
     const user = results[0];
@@ -197,12 +254,46 @@ app.post('/login', (req, res) => {
   });
 });
 
+// Route to setup admin user (one-time use or utility)
+app.get('/setup-admin', async (req, res) => {
+  const name = 'admin';
+  const email = 'admin';
+  const password = 'admin';
+  const role = 'admin';
+
+  try {
+    const hashed = await bcrypt.hash(password, 10);
+    
+    // Check if exists first
+    db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
+      if (err) return res.status(500).json({ error: 'DB error checking existence', err });
+      
+      if (results.length > 0) {
+        // Update existing
+        db.query('UPDATE users SET password = ?, role = ?, name = ? WHERE email = ?', [hashed, role, name, email], (err) => {
+          if (err) return res.status(500).json({ error: 'DB error updating admin', err });
+          return res.send('<h1>Admin user updated successfully!</h1><p>Email: admin<br>Password: admin</p><a href="http://localhost:4200/login">Go to Login</a>');
+        });
+      } else {
+        // Create new
+        const sql = 'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)';
+        db.query(sql, [name, email, hashed, role], (err) => {
+          if (err) return res.status(500).json({ error: 'DB error creating admin', err });
+          return res.send('<h1>Admin user created successfully!</h1><p>Email: admin<br>Password: admin</p><a href="http://localhost:4200/login">Go to Login</a>');
+        });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', err });
+  }
+});
+
 // ---------- Locals routes (protected) ----------
 // Create local
 app.post('/locals', verifyToken, isLandlord, (req, res) => {
-  const { titre, adresse, description, prix, disponibilite } = req.body;
-  const sql = 'INSERT INTO locals (titre, adresse, description, prix, disponibilite, user_id) VALUES (?, ?, ?, ?, ?, ?)';
-  db.query(sql, [titre, adresse, description, prix, disponibilite ? 1 : 1, req.user.id], (err, result) => {
+  const { title, address, description, price, availability } = req.body;
+  const sql = 'INSERT INTO locals (title, address, description, price, availability, user_id, status) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  db.query(sql, [title, address, description, price, availability ? 1 : 1, req.user.id, 'pending'], (err, result) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
     return res.json({ message: 'Local created', id: result.insertId });
   });
@@ -213,6 +304,7 @@ app.get('/locals/my', verifyToken, isLandlord, (req, res) => {
   const sql = `
     SELECT 
       l.*,
+      EXISTS(SELECT 1 FROM reservations r WHERE r.local_id = l.id AND r.status = 'reserved') as is_reserved,
 
       -- latest image
       (
@@ -225,7 +317,7 @@ app.get('/locals/my', verifyToken, isLandlord, (req, res) => {
 
       -- average rating
       (
-        SELECT AVG(e.note)
+        SELECT AVG(e.rating)
         FROM evaluations e
         WHERE e.local_id = l.id
       ) AS evaluation,
@@ -255,17 +347,30 @@ app.get('/locals/my', verifyToken, isLandlord, (req, res) => {
 app.delete('/reservations/:id', verifyToken, isRenter, (req, res) => {
   const reservationId = req.params.id;
 
-  db.query('DELETE FROM reservations WHERE id = ?', [reservationId], (err, result) => {
+  // Get local_id first to restore availability
+  db.query('SELECT local_id FROM reservations WHERE id = ?', [reservationId], (err, rows) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
-    return res.json({ message: 'Reservation deleted', count: result.affectedRows });
+    if (rows.length === 0) return res.status(404).json({ message: 'Reservation not found' });
+    
+    const localId = rows[0].local_id;
+
+    db.query('DELETE FROM reservations WHERE id = ?', [reservationId], (err, result) => {
+      if (err) return res.status(500).json({ message: 'DB error', err });
+      
+      // Update local availability back to 1
+      db.query('UPDATE locals SET availability = 1 WHERE id = ?', [localId], (updateErr) => {
+        if (updateErr) console.error('Error restoring availability:', updateErr);
+        return res.json({ message: 'Reservation deleted', count: result.affectedRows });
+      });
+    });
   });
 });
 
 // Update local
 app.put('/locals/:id', verifyToken, isLandlord, (req, res) => {
-  const { titre, adresse, description, prix, disponibilite } = req.body;
-  const sql = 'UPDATE locals SET titre=?, adresse=?, description=?, prix=?, disponibilite=? WHERE id=? AND user_id=?';
-  db.query(sql, [titre, adresse, description, prix, disponibilite ? 1 : 0, req.params.id, req.user.id], (err, result) => {
+  const { title, address, description, price, availability } = req.body;
+  const sql = 'UPDATE locals SET title=?, address=?, description=?, price=?, availability=? WHERE id=? AND user_id=?';
+  db.query(sql, [title, address, description, price, availability ? 1 : 0, req.params.id, req.user.id], (err, result) => {
     if (err) return res.status(500).json({ message: 'DB error', err });
     if (result.affectedRows === 0) return res.status(404).json({ message: 'Local not found or not owned' });
     return res.json({ message: 'Local updated' });
@@ -381,7 +486,7 @@ app.get('/locals/available', verifyToken, isRenter, (req, res) => {
         LIMIT 1
       ) AS cover_image,
       (
-        SELECT AVG(e.note)
+        SELECT AVG(e.rating)
         FROM evaluations e
         WHERE e.local_id = l.id
       ) AS evaluation,
@@ -392,7 +497,7 @@ app.get('/locals/available', verifyToken, isRenter, (req, res) => {
       ) AS total_reviews
     FROM locals l
     LEFT JOIN users u ON u.id = l.user_id
-    WHERE l.disponibilite = 1 AND l.user_id != ?
+    WHERE l.availability = 1 AND l.user_id != ? AND l.status = 'approved'
     ORDER BY l.id DESC
   `;
 
@@ -410,7 +515,7 @@ app.get('/locals/:id/public-images', verifyToken, isRenter, (req, res) => {
     SELECT li.id, li.image_url
     FROM local_images li
     INNER JOIN locals l ON l.id = li.local_id
-    WHERE li.local_id = ? AND l.disponibilite = 1
+    WHERE li.local_id = ? AND l.availability = 1
     ORDER BY li.id DESC
   `;
 
@@ -424,11 +529,11 @@ app.get('/reservations/my', verifyToken, isRenter, (req, res) => {
   const sql = `
     SELECT
       r.*,
-      r.dateDebut AS start_date,
-      r.dateFin AS end_date,
-      l.titre,
-      l.adresse,
-      l.prix,
+      r.startDate AS start_date,
+      r.endDate AS end_date,
+      l.title,
+      l.address,
+      l.price,
       (
         SELECT li.image_url
         FROM local_images li
@@ -461,7 +566,7 @@ app.post('/reservations', verifyToken, isRenter, (req, res) => {
     return res.status(400).json({ message: 'Start date must be before end date' });
   }
 
-  const localSql = 'SELECT id FROM locals WHERE id = ? AND disponibilite = 1 LIMIT 1';
+  const localSql = 'SELECT id FROM locals WHERE id = ? AND availability = 1 LIMIT 1';
   db.query(localSql, [localId], (localErr, localRows) => {
     if (localErr) return sendDbError(res, localErr);
     if (!localRows || localRows.length === 0) {
@@ -472,9 +577,9 @@ app.post('/reservations', verifyToken, isRenter, (req, res) => {
       SELECT id
       FROM reservations
       WHERE local_id = ?
-        AND statut = 'reserved'
-        AND dateDebut <= ?
-        AND dateFin >= ?
+        AND status = 'reserved'
+        AND startDate <= ?
+        AND endDate >= ?
       LIMIT 1
     `;
 
@@ -485,13 +590,18 @@ app.post('/reservations', verifyToken, isRenter, (req, res) => {
       }
 
       const insertSql = `
-        INSERT INTO reservations (dateDebut, dateFin, statut, user_id, local_id)
+        INSERT INTO reservations (startDate, endDate, status, user_id, local_id)
         VALUES (?, ?, 'reserved', ?, ?)
       `;
 
       db.query(insertSql, [startDate, endDate, req.user.id, localId], (insertErr, result) => {
         if (insertErr) return sendDbError(res, insertErr);
-        return res.json({ message: 'Reservation created', id: result.insertId });
+        
+        // Update local availability to 0
+        db.query('UPDATE locals SET availability = 0 WHERE id = ?', [localId], (updateErr) => {
+          if (updateErr) console.error('Error updating availability:', updateErr);
+          return res.json({ message: 'Reservation created', id: result.insertId });
+        });
       });
     });
   });
@@ -500,15 +610,15 @@ app.post('/reservations', verifyToken, isRenter, (req, res) => {
 app.post('/evaluations', verifyToken, isRenter, (req, res) => {
   const evaluationsUserColumn = schemaColumns.evaluationsUserColumn;
   const localId = Number(req.body?.local_id);
-  const note = Number(req.body?.note);
-  const commentaire = req.body?.commentaire || null;
+  const rating = Number(req.body?.rating);
+  const comment = req.body?.comment || null;
 
-  if (!localId || !note) {
+  if (!localId || !rating) {
     return res.status(400).json({ message: 'Missing evaluation fields' });
   }
 
-  if (note < 1 || note > 5) {
-    return res.status(400).json({ message: 'Note must be between 1 and 5' });
+  if (rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'Rating must be between 1 and 5' });
   }
 
   const reservationSql = `
@@ -525,22 +635,107 @@ app.post('/evaluations', verifyToken, isRenter, (req, res) => {
     }
 
     const evaluationSql = `
-      INSERT INTO evaluations (local_id, ${evaluationsUserColumn}, note, commentaire)
+      INSERT INTO evaluations (local_id, ${evaluationsUserColumn}, rating, comment)
       VALUES (?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
-        note = VALUES(note),
-        commentaire = VALUES(commentaire)
+        rating = VALUES(rating),
+        comment = VALUES(comment)
     `;
 
-    db.query(evaluationSql, [localId, req.user.id, note, commentaire], (evaluationErr, result) => {
+    db.query(evaluationSql, [localId, req.user.id, rating, comment], (evaluationErr, result) => {
       if (evaluationErr) return sendDbError(res, evaluationErr);
       return res.json({ message: 'Evaluation saved', id: result.insertId || null });
     });
   });
 });
 
+// ---------- Admin routes ----------
+app.get('/admin/locals', verifyToken, isAdmin, (req, res) => {
+  console.log('GET /admin/locals hit by user:', req.user.id);
+  const sql = `
+    SELECT l.*, u.email as landlord_email,
+           EXISTS(SELECT 1 FROM reservations r WHERE r.local_id = l.id AND r.status = 'reserved') as is_reserved
+    FROM locals l
+    LEFT JOIN users u ON u.id = l.user_id
+    ORDER BY l.id DESC
+  `;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.error('Error fetching admin locals:', err);
+      return sendDbError(res, err);
+    }
+    console.log(`Returning ${rows.length} locals for admin`);
+    res.json(rows);
+  });
+});
+
+app.put('/admin/locals/:id/status', verifyToken, isAdmin, (req, res) => {
+  const { status } = req.body;
+  if (!['pending', 'approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+  const sql = 'UPDATE locals SET status = ? WHERE id = ?';
+  db.query(sql, [status, req.params.id], (err, result) => {
+    if (err) return sendDbError(res, err);
+    res.json({ message: 'Status updated' });
+  });
+});
+
+app.put('/admin/locals/:id', verifyToken, isAdmin, (req, res) => {
+  const { title, address, description, price, availability, status } = req.body;
+  const sql = 'UPDATE locals SET title=?, address=?, description=?, price=?, availability=?, status=? WHERE id=?';
+  db.query(sql, [title, address, description, price, availability ? 1 : 0, status, req.params.id], (err, result) => {
+    if (err) return sendDbError(res, err);
+    res.json({ message: 'Local updated' });
+  });
+});
+
+app.delete('/admin/locals/:id', verifyToken, isAdmin, (req, res) => {
+  const localId = req.params.id;
+  db.query('DELETE FROM evaluations WHERE local_id = ?', [localId]);
+  db.query('DELETE FROM reservations WHERE local_id = ?', [localId]);
+  db.query('DELETE FROM local_images WHERE local_id = ?', [localId]);
+  db.query('DELETE FROM locals WHERE id = ?', [localId], (err) => {
+    if (err) return sendDbError(res, err);
+    res.json({ message: 'Local deleted' });
+  });
+});
+
+app.get('/admin/users', verifyToken, isAdmin, (req, res) => {
+  console.log('GET /admin/users hit by user:', req.user.id);
+  const sql = 'SELECT id, name, email, role FROM users ORDER BY id DESC';
+  db.query(sql, (err, rows) => {
+    if (err) {
+      console.error('Error fetching admin users:', err);
+      return sendDbError(res, err);
+    }
+    console.log(`Returning ${rows.length} users for admin`);
+    res.json(rows);
+  });
+});
+
+app.put('/admin/users/:id', verifyToken, isAdmin, (req, res) => {
+  const { name, email, role } = req.body;
+  const sql = 'UPDATE users SET name=?, email=?, role=? WHERE id=?';
+  db.query(sql, [name, email, role, req.params.id], (err, result) => {
+    if (err) return sendDbError(res, err);
+    res.json({ message: 'User updated' });
+  });
+});
+
+app.delete('/admin/users/:id', verifyToken, isAdmin, (req, res) => {
+  const userId = req.params.id;
+  // Note: deleting a user might require deleting their locals/reservations too
+  // but for simplicity we'll just delete the user or handle foreign keys if they exist.
+  db.query('DELETE FROM users WHERE id = ?', [userId], (err) => {
+    if (err) return sendDbError(res, err);
+    res.json({ message: 'User deleted' });
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 Promise.all([
+  ensureLocalsTable(),
   ensureLocalImagesTable(),
   ensureReservationsTable(),
   ensureEvaluationsTable(),

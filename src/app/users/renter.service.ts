@@ -31,7 +31,7 @@ export class RenterService {
     return this.http.post(`${this.baseUrl}/reservations`, data, this.authHeaders());
   }
 
-  evaluateLocal(data: { local_id: number; note: number; commentaire?: string }) {
+  evaluateLocal(data: { local_id: number; rating: number; comment?: string }) {
     return this.http.post(`${this.baseUrl}/evaluations`, data, this.authHeaders());
   }
 

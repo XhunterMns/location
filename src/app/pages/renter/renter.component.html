@@ -25,12 +25,12 @@
         <article class="reservation-item" *ngFor="let reservation of reservations">
           <img *ngIf="reservation.cover_image"
           [src]="reservation.cover_image"
-          [alt]="reservation.titre"
+          [alt]="reservation.title"
           class="reservation-image"
           (click)="openZoom(reservation.cover_image)" />
           <div class="reservation-copy">
-            <h3>{{ reservation.titre }}</h3>
-            <p>{{ reservation.adresse }}</p>
+            <h3>{{ reservation.title }}</h3>
+            <p>{{ reservation.address }}</p>
             <p>
               {{ reservation.start_date | date:'mediumDate' }} to
               {{ reservation.end_date | date:'mediumDate' }}
@@ -38,8 +38,8 @@
           </div>
           <span class="status-pill">{{ reservation.status }}</span>
           <div class="button-group">
-            <button class="pay-btn">Pay</button>
-            <button class="delete-btn" (click)="delete(reservation.id)">Delete</button>
+            <button class="pay-btn" title="Proceed to Payment">💳 Pay</button>
+            <button class="delete-btn" (click)="delete(reservation.id)" title="Cancel Reservation">🗑️ Delete</button>
           </div>
         </article>
       </div>
@@ -53,19 +53,19 @@
 <!-- CLICK IMAGE TO ZOOM -->
 <img *ngIf="local.cover_image"
      [src]="local.cover_image"
-     [alt]="local.titre"
+     [alt]="local.title"
      class="cover-image"
      (click)="openZoom(local.cover_image)" />        <div class="local-copy">
-          <h3>{{ local.titre }}</h3>
-          <p>{{ local.adresse }}</p>
+          <h3>{{ local.title }}</h3>
+          <p>{{ local.address }}</p>
           <p class="landlord-name">Owner: {{ local.landlord_name || 'Unknown' }}</p>
-          <p class="price">{{ local.prix }} TND</p>
+          <p class="price">{{ local.price }} TND</p>
           <p class="evaluation">
-            ⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : '0.0' }}
+            ⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : 'New' }}
             ({{ local.total_reviews || 0 }} reviews)
           </p>
         </div>
-        <button class="view-btn" type="button" (click)="view(local)">Reserve / Evaluate</button>
+        <button class="view-btn" type="button" (click)="view(local)" title="View details and reserve">🏠 Reserve / Evaluate</button>
       </article>
     </div>
 
@@ -89,10 +89,10 @@
 
       <div class="modal-header">
         <div>
-          <h2 id="local-title">{{ selectedLocal.titre }}</h2>
-          <p>{{ selectedLocal.adresse }}</p>
+          <h2 id="local-title">{{ selectedLocal.title }}</h2>
+          <p>{{ selectedLocal.address }}</p>
         </div>
-        <p class="modal-price">{{ selectedLocal.prix }} TND</p>
+        <p class="modal-price">{{ selectedLocal.price }} TND</p>
       </div>
 
       <p class="modal-description">
@@ -114,7 +114,7 @@
   <!-- IMAGE DISPLAY -->
   <img
     [src]="selectedLocal.images[currentImageIndex].image_url"
-    [alt]="selectedLocal.titre"
+    [alt]="selectedLocal.title"
     class="detail-image"
   />
 
@@ -145,7 +145,7 @@
 
           <label>
             <span>Rating</span>
-            <select formControlName="note">
+            <select formControlName="rating">
               <option [value]="5">5 - Excellent</option>
               <option [value]="4">4 - Very good</option>
               <option [value]="3">3 - Good</option>
@@ -156,7 +156,7 @@
 
           <label>
             <span>Comment</span>
-            <textarea rows="4" formControlName="commentaire" placeholder="Share your experience"></textarea>
+            <textarea rows="4" formControlName="comment" placeholder="Share your experience"></textarea>
           </label>
 
           <button type="submit" class="secondary-btn">Save Evaluation</button>

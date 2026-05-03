@@ -1,1 +1,173 @@
-<button (click)="logout()">Logout</button>
+<div class="admin-container">
+  <nav class="admin-nav">
+    <div class="nav-brand">Admin Dashboard</div>
+    <div class="nav-links">
+      <button [class.active]="activeTab === 'locals'" (click)="setTab('locals')">Manage Locals</button>
+      <button [class.active]="activeTab === 'users'" (click)="setTab('users')">Manage Users</button>
+      <button class="refresh-btn" (click)="loadData()" [disabled]="loading">
+        <span *ngIf="!loading">🔄 Refresh</span>
+        <span *ngIf="loading">⌛ Loading...</span>
+      </button>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <main class="admin-content">
+    <div *ngIf="loading" class="loading-state">
+      <p>Loading data...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+      <button (click)="loadData()">Retry</button>
+    </div>
+
+    <!-- Manage Locals Tab -->
+    <section *ngIf="!loading && activeTab === 'locals'">
+      <h2>Locals Management</h2>
+      <div class="table-responsive" *ngIf="locals.length > 0; else noLocals">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Address</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Landlord</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let local of locals">
+              <td>{{ local.id }}</td>
+              <td>{{ local.title }}</td>
+              <td>{{ local.address }}</td>
+              <td>{{ local.price }} DH</td>
+              <td>
+                <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : local.status">
+                  {{ local.is_reserved ? 'reserved' : local.status }}
+                </span>
+              </td>
+              <td>{{ local.landlord_email }}</td>
+              <td class="action-buttons">
+                <button class="btn-approve" (click)="updateStatus(local.id, 'approved')" title="Approve">✅ Approve</button>
+                <button class="btn-reject" (click)="updateStatus(local.id, 'rejected')" title="Reject">❌ Reject</button>
+                <button class="btn-edit" (click)="editLocal(local)" title="Edit">✏️ Edit</button>
+                <button class="btn-delete" (click)="deleteLocal(local.id)" title="Delete">🗑️ Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noLocals>
+        <div class="empty-state">
+          <p>No locals found for evaluation.</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- Manage Users Tab -->
+    <section *ngIf="!loading && activeTab === 'users'">
+      <h2>User Management</h2>
+      <div class="table-responsive" *ngIf="users.length > 0; else noUsers">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-edit" (click)="editUser(user)">Edit</button>
+                  <button class="btn-delete" (click)="deleteUser(user.id)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noUsers>
+        <div class="empty-state">
+          <p>No users found in the system.</p>
+        </div>
+      </ng-template>
+    </section>
+  </main>
+
+  <!-- Edit Local Modal -->
+  <div class="modal" *ngIf="editingLocal">
+    <div class="modal-content">
+      <h3>Edit Local</h3>
+      <form (ngSubmit)="saveLocal()">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="editingLocal.title" name="title">
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" [(ngModel)]="editingLocal.address" name="address">
+        </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" [(ngModel)]="editingLocal.price" name="price">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="editingLocal.description" name="description" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select [(ngModel)]="editingLocal.status" name="status">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" class="btn-cancel" (click)="editingLocal = null">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal" *ngIf="editingUser">
+    <div class="modal-content">
+      <h3>Edit User</h3>
+      <form (ngSubmit)="saveUser()">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" [(ngModel)]="editingUser.name" name="name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="editingUser.email" name="email">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select [(ngModel)]="editingUser.role" name="role">
+            <option value="landlord">Landlord</option>
+            <option value="renter">Renter</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" class="btn-cancel" (click)="editingUser = null">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -80,50 +80,110 @@
   color: #0f3d2e;
 }
 
+.status {
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.status-badge.approved {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.status-badge.rejected {
+  background: #ff5252;
+  color: white;
+}
+
+.status-badge.reserved {
+  background: #ff9800;
+  color: white;
+}
+
 .card-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
 }
 
-button {
-  border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-weight: 700;
+.card-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: 0.25s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.add-btn,
 .view-btn {
-  background: #0f3d2e;
-  color: #fff;
+  background: rgba(15, 61, 46, 0.1);
+  color: #0f3d2e;
+  border-color: rgba(15, 61, 46, 0.2);
 }
 
-.add-btn:hover,
 .view-btn:hover {
-  background: #145c43;
+  background: #0f3d2e;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 61, 46, 0.2);
 }
 
 .edit-btn {
-  background: rgba(34, 80, 150, 0.9);
-  color: #fff;
+  background: rgba(34, 80, 150, 0.1);
+  color: #225096;
+  border-color: rgba(34, 80, 150, 0.2);
 }
 
 .edit-btn:hover {
-  background: rgba(25, 63, 121, 0.95);
+  background: #225096;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 80, 150, 0.2);
 }
 
 .delete-btn {
-  background: rgba(167, 25, 25, 0.88);
-  color: #fff;
+  background: rgba(167, 25, 25, 0.1);
+  color: #a71919;
+  border-color: rgba(167, 25, 25, 0.2);
 }
 
 .delete-btn:hover {
-  background: rgba(136, 16, 16, 0.95);
+  background: #a71919;
+  color: white;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(167, 25, 25, 0.2);
+}
+
+.add-btn {
+  background: #0f3d2e;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 12px rgba(15, 61, 46, 0.3);
+}
+
+.add-btn:hover {
+  background: #145c43;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 61, 46, 0.4);
 }
 
 .empty-state {

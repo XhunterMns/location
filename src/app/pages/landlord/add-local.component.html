@@ -11,23 +11,23 @@
 
         <form [formGroup]="localForm" (ngSubmit)="submit()" class="form-group">
             <div class="input-box">
-                <label>Titre</label>
-                <input formControlName="titre" placeholder="Enter local title" />
+                <label>Title</label>
+                <input formControlName="title" placeholder="Enter local title" />
             </div>
 
             <div class="input-box">
-                <label>Adresse</label>
-                <input formControlName="adresse" placeholder="Enter address" />
+                <label>Address</label>
+                <input formControlName="address" placeholder="Enter address" />
             </div>
 
             <div class="input-box">
                 <label>Description</label>
-                <textarea formControlName="description" placeholder="Add a short description"></textarea>
+                <textarea formControlName="description" placeholder="Describe the local" rows="4"></textarea>
             </div>
 
             <div class="input-box">
-                <label>Prix</label>
-                <input type="number" formControlName="prix" placeholder="Enter price" />
+                <label>Price (TND)</label>
+                <input type="number" formControlName="price" placeholder="Enter price" />
             </div>
             <div class="upload-box">
                 <label>Upload Images</label>

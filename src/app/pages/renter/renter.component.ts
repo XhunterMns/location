@@ -29,8 +29,8 @@ export class RenterComponent {
   });
 
   evaluationForm = new FormGroup({
-    note: new FormControl(5, { nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5)] }),
-    commentaire: new FormControl('', { nonNullable: true })
+    rating: new FormControl(5, { nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5)] }),
+    comment: new FormControl('', { nonNullable: true })
   });
 
   constructor(
@@ -75,7 +75,7 @@ export class RenterComponent {
     this.reservationMessage = '';
     this.evaluationMessage = '';
     this.reservationForm.reset({ start_date: '', end_date: '' });
-    this.evaluationForm.reset({ note: 5, commentaire: '' });
+    this.evaluationForm.reset({ rating: 5, comment: '' });
 
     this.renterService.getLocalImages(local.id).subscribe({
       next: (images: any) => {
@@ -138,8 +138,8 @@ export class RenterComponent {
 
     const payload = {
       local_id: this.selectedLocal.id,
-      note: Number(this.evaluationForm.getRawValue().note),
-      commentaire: this.evaluationForm.getRawValue().commentaire.trim()
+      rating: Number(this.evaluationForm.getRawValue().rating),
+      comment: this.evaluationForm.getRawValue().comment.trim()
     };
 
 
