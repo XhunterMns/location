@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs/operators';
 
@@ -15,6 +15,26 @@ export class AuthService {
 
   private hasStorage() {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
+
+  private authHeaders() {
+    const token = this.getToken();
+    return token ? { headers: new HttpHeaders().set('Authorization', `Bearer ${token}`) } : {};
+  }
+
+  private decodeToken() {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const base64Url = token.split('.')[1];
+      if (!base64Url) return null;
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+      return JSON.parse(atob(padded));
+    } catch {
+      return null;
+    }
   }
 
   signup(data: any) {
@@ -52,5 +72,18 @@ export class AuthService {
   getToken() {
     if (!this.hasStorage()) return null;
     return localStorage.getItem('token');
+  }
+
+  getCurrentUserId() {
+    const payload = this.decodeToken();
+    return payload?.id ? Number(payload.id) : null;
+  }
+
+  getProfile() {
+    return this.httpClient.get(`${this.baseUrl}/profile`, this.authHeaders());
+  }
+
+  updateProfile(data: any) {
+    return this.httpClient.put(`${this.baseUrl}/profile`, data, this.authHeaders());
   }
 }

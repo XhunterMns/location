@@ -21,6 +21,14 @@ export class RenterComponent {
   reservationsError = '';
   reservationMessage = '';
   evaluationMessage = '';
+  searchTerm = '';
+  cityFilter = '';
+  priceSort: 'asc' | 'desc' | '' = '';
+  readonly tunisianCities = [
+    'Tunis', 'Sfax', 'Sousse', 'Monastir', 'Kairouan', 'Bizerte', 'Nabeul', 'Gabès', 'Ben Arous',
+    'Ariana', 'Gafsa', 'Tozeur', 'Kasserine', 'Médenine', 'Mahdia', 'Jendouba', 'Manouba',
+    'Kébili', 'Siliana', 'Zaghouan', 'Beja', 'Tataouine'
+  ];
   authService = inject(AuthService);
   router = inject(Router);
   reservationForm = new FormGroup({
@@ -37,6 +45,52 @@ export class RenterComponent {
     private renterService: RenterService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
+
+  get filteredLocals(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    const filtered = this.locals.filter((local) => {
+      const cityMatch = !this.cityFilter || String(local?.city || local?.address || '').toLowerCase().includes(this.cityFilter.toLowerCase());
+      const searchMatch = !term || [
+        local?.title,
+        local?.address,
+        local?.landlord_name,
+        local?.description,
+        local?.price?.toString(),
+        local?.city,
+        local?.delegation
+      ].some((value) => String(value ?? '').toLowerCase().includes(term));
+
+      return cityMatch && searchMatch;
+    });
+
+    if (this.priceSort === 'asc') {
+      return filtered.sort((a, b) => Number(a.price) - Number(b.price));
+    }
+
+    if (this.priceSort === 'desc') {
+      return filtered.sort((a, b) => Number(b.price) - Number(a.price));
+    }
+
+    return filtered;
+  }
+
+  get filteredReservations(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.reservations;
+
+    return this.reservations.filter((reservation) => {
+      const fields = [
+        reservation?.title,
+        reservation?.address,
+        reservation?.status,
+        reservation?.start_date,
+        reservation?.end_date
+      ];
+
+      return fields.some((value) => String(value ?? '').toLowerCase().includes(term));
+    });
+  }
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -95,6 +149,31 @@ export class RenterComponent {
     this.selectedLocal = null;
     this.reservationMessage = '';
     this.evaluationMessage = '';
+  }
+
+  normalizePhoneNumber(phone: string): string {
+    if (!phone) return '';
+    return phone.replace(/\s+/g, '').replace(/[^\d+]/g, '');
+  }
+
+  openWhatsApp(phone: string) {
+    const cleanPhone = this.normalizePhoneNumber(phone);
+    if (!cleanPhone || typeof window === 'undefined') return;
+
+    const waNumber = cleanPhone.startsWith('+') ? cleanPhone.slice(1) : cleanPhone;
+    window.open(`https://wa.me/${waNumber}`, '_blank', 'noopener,noreferrer');
+  }
+
+  callOwner(phone: string) {
+    const cleanPhone = this.normalizePhoneNumber(phone);
+    if (!cleanPhone || typeof window === 'undefined') return;
+    window.location.href = `tel:${cleanPhone}`;
+  }
+
+  messageOwner(phone: string) {
+    const cleanPhone = this.normalizePhoneNumber(phone);
+    if (!cleanPhone || typeof window === 'undefined') return;
+    window.location.href = `sms:${cleanPhone}`;
   }
   zoomImage: string | null = null;
 

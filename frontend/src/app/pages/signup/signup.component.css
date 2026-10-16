@@ -1,0 +1,210 @@
+.auth-shell {
+  min-height: calc(100vh - 72px);
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 2.2rem;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem) 3rem;
+}
+
+.auth-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 540px;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border-radius: var(--radius-xl);
+  background:
+    linear-gradient(135deg, rgba(20, 43, 74, 0.92), rgba(15, 157, 138, 0.78)),
+    url('https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+  color: white;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.auth-visual::after {
+  content: '';
+  position: absolute;
+  inset: auto auto -80px -50px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.brand-block,
+.feature-list {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow.subtle {
+  background: rgba(20, 43, 74, 0.04);
+  border-color: rgba(20, 43, 74, 0.08);
+  color: var(--navy-900);
+}
+
+.brand-block h1 {
+  margin: 1.2rem 0 0.9rem;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.06em;
+  max-width: 12ch;
+}
+
+.brand-block p {
+  margin: 0;
+  max-width: 32rem;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.feature-list {
+  list-style: none;
+  display: grid;
+  gap: 0.9rem;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+}
+
+.feature-list li::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.auth-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.panel-header {
+  margin-bottom: 1.7rem;
+}
+
+.mini-logo {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy-900), var(--teal-600));
+  color: white;
+  font-weight: 800;
+  margin-bottom: 0.9rem;
+}
+
+.panel-header h2 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.9rem, 2vw, 2.5rem);
+  letter-spacing: -0.05em;
+  color: var(--navy-900);
+}
+
+.auth-form {
+  display: grid;
+  gap: 1.1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--text);
+}
+
+.field span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--navy-800);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  border: 1px solid rgba(20, 43, 74, 0.12);
+  border-radius: 0.9rem;
+  background: var(--surface-alt);
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: rgba(15, 157, 138, 0.7);
+  box-shadow: 0 0 0 4px rgba(15, 157, 138, 0.12);
+}
+
+.primary-btn {
+  border: none;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, var(--navy-900), var(--teal-600));
+  color: white;
+  font-weight: 700;
+  padding: 1rem 1.2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 14px 28px rgba(20, 43, 74, 0.18);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 30px rgba(20, 43, 74, 0.22);
+}
+
+.switch-copy {
+  margin: 1.4rem 0 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.switch-copy a {
+  color: var(--teal-600);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    padding-top: 1rem;
+  }
+
+  .auth-visual {
+    min-height: 320px;
+  }
+}

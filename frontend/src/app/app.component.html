@@ -1,0 +1,42 @@
+<nav class="navbar" *ngIf="showBrandHeader()">
+  <div class="nav-left">
+    <a class="logo" [routerLink]="showAppLayout() ? (currentRole === 'admin' ? '/admin' : currentRole === 'landlord' ? '/landlord' : '/renter') : '/login'">
+      <span class="logo-mark">L</span> Location
+    </a>
+  </div>
+
+  <div class="nav-right" *ngIf="showAppLayout(); else guestLinks">
+    <ng-container *ngFor="let item of headerItems">
+      <a [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ item.label }}</a>
+    </ng-container>
+    <button class="logout-btn" (click)="logout()">Logout</button>
+  </div>
+
+  <ng-template #guestLinks>
+    <div class="nav-right">
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a routerLink="/signup" routerLinkActive="active">Sign up</a>
+    </div>
+  </ng-template>
+</nav>
+
+<div class="app-shell" *ngIf="showAppLayout()">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="role-badge">{{ currentRole | titlecase }}</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of sideBarItems" class="sidebar-item" [routerLink]="item.route" routerLinkActive="active">
+        <span class="sidebar-icon">{{ item.icon || '•' }}</span>
+        <span>{{ item.label }}</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="content-area">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
+<router-outlet *ngIf="!showAppLayout()"></router-outlet>

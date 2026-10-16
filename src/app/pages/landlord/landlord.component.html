@@ -1,123 +1,138 @@
-<div class="landlord-page">
-  <div class="page-overlay"></div>
-
-  <div class="landlord-content">
-    <div class="top-bar glass-card">
-      <div>
-        <h2>My Locals</h2>
-        <p>Manage your property listings in one place.</p>
-      </div>
-      <button class="add-btn glass-card" routerLink="/landlord/add">+ Add Local</button>
+<div class="landlord-shell">
+  <header class="landlord-header panel-surface">
+    <div>
+      <p class="section-kicker">Portfolio</p>
+      <h1>My listings</h1>
+      <p class="lead-copy">Manage your properties, review status updates, and keep every rental listing current.</p>
     </div>
 
-    <div class="locals-grid" *ngIf="locals.length; else emptyState">
-      <article class="local-card glass-card" *ngFor="let l of locals">
+    <button class="add-btn" routerLink="/landlord/add">+ Add listing</button>
+  </header>
+
+  <section class="listings-panel panel-surface">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Overview</p>
+        <h2>Active local catalog</h2>
+      </div>
+      <span class="pill-count">{{ filteredLocals.length }} listings</span>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        placeholder="Search listings by title, address, status..."
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value"
+      />
+    </div>
+
+    <div class="locals-grid" *ngIf="filteredLocals.length; else emptyState">
+      <article class="local-card panel-surface" *ngFor="let l of filteredLocals">
         <img *ngIf="l.cover_image" [src]="l.cover_image" [alt]="l.title" class="cover-image" />
-        <h3>{{ l.title }}</h3>
-        <p class="address">{{ l.address }}</p>
-        <p class="price">{{ l.price }} TND</p>
-        <p class="status">
-          Status: 
-          <span class="status-badge" [ngClass]="l.is_reserved ? 'reserved' : l.status">
-            {{ l.is_reserved ? 'reserved' : (l.status || 'pending') }}
-          </span>
-        </p>
-        <p class="evaluation">
-          ⭐ {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }}
-          ({{ l.total_reviews }} reviews)
-        </p>
+
+        <div class="local-info">
+          <div class="title-row">
+            <h3>{{ l.title }}</h3>
+            <span class="price-tag">{{ l.price }} TND</span>
+          </div>
+          <p class="address">{{ l.address }}</p>
+          <p class="status-row">
+            Availability:
+            <span class="status-badge" [ngClass]="l.is_reserved ? 'reserved' : 'active'">
+              {{ l.is_reserved ? 'reserved' : 'active' }}
+            </span>
+          </p>
+          <p class="evaluation-row">
+            ⭐ {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }}
+            <span>({{ l.total_reviews }} reviews)</span>
+          </p>
+        </div>
 
         <div class="card-actions">
-          <button class="view-btn" (click)="view(l)" title="View Details">👁️ View</button>
-          <button class="edit-btn" (click)="update(l)" title="Edit Local">✏️ Edit</button>
-          <button class="delete-btn" (click)="delete(l.id)" title="Delete Local">🗑️ Delete</button>
+          <button class="view-btn" (click)="view(l)">View</button>
+          <button class="edit-btn" (click)="update(l)">Edit</button>
+          <button class="delete-btn" (click)="delete(l.id)">Delete</button>
         </div>
       </article>
     </div>
 
     <ng-template #emptyState>
-      <div class="empty-state glass-card">
-        <h3>No locals yet</h3>
+      <div class="empty-state">
+        <h3>No properties yet</h3>
         <p>Create your first listing to start managing rentals.</p>
       </div>
     </ng-template>
-  </div>
-<div class="view-modal-wrap" *ngIf="selectedLocal">
-  <div class="modal-backdrop" (click)="closeView()"></div>
-  <div class="view-modal glass-card">
-    <button class="close-btn" type="button" (click)="closeView()">x</button>
-    <h3>{{ selectedLocal.title }}</h3>
-    <p>{{ selectedLocal.address }}</p>
-    <p>{{ selectedLocal.description }}</p>
-    <p>{{ selectedLocal.price }} TND</p>
-    <p *ngIf="selectedLocal.is_reserved">Reserved</p>
-    <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 1">Available</p>
-    <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 0">Not Available</p>
+  </section>
 
-    <div class="images-grid">
-     <!-- ================= IMAGE SLIDER ================= -->
-<div class="image-slider" *ngIf="selectedLocal.images?.length">
+  <div class="view-modal-wrap" *ngIf="selectedLocal">
+    <div class="modal-backdrop" (click)="closeView()"></div>
 
-  <!-- LEFT ARROW -->
-  <button class="nav-btn left" (click)="prevImage()">‹</button>
+    <div class="view-modal panel-surface">
+      <button class="close-btn" type="button" (click)="closeView()">×</button>
 
-  <!-- IMAGE DISPLAY -->
-  <img
-    [src]="selectedLocal.images[currentImageIndex].image_url"
-    [alt]="selectedLocal.title"
-    class="detail-image"
-  />
+      <div class="modal-header">
+        <div>
+          <p class="section-kicker">Property overview</p>
+          <h3>{{ selectedLocal.title }}</h3>
+        </div>
+        <p class="modal-price">{{ selectedLocal.price }} TND</p>
+      </div>
 
-  <!-- RIGHT ARROW -->
-  <button class="nav-btn right" (click)="nextImage()">›</button>
+      <p>{{ selectedLocal.address }}</p>
+      <p>{{ selectedLocal.description }}</p>
+      <p *ngIf="selectedLocal.is_reserved">Reserved</p>
+      <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 1">Available</p>
+      <p *ngIf="!selectedLocal.is_reserved && selectedLocal.availability === 0">Not available</p>
 
-</div>
+      <div class="image-slider" *ngIf="selectedLocal.images?.length">
+        <button class="nav-btn left" (click)="prevImage()">‹</button>
+        <img [src]="selectedLocal.images[currentImageIndex].image_url" [alt]="selectedLocal.title" class="detail-image" />
+        <button class="nav-btn right" (click)="nextImage()">›</button>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="view-modal-wrap" *ngIf="editLocal">
     <div class="modal-backdrop" (click)="closeEdit()"></div>
 
-    <div class="view-modal glass-card">
-      <button class="close-btn" type="button" (click)="closeEdit()">x</button>
+    <div class="view-modal panel-surface form-panel">
+      <button class="close-btn" type="button" (click)="closeEdit()">×</button>
 
-      <h3>Edit Local</h3>
+      <h3>Edit listing</h3>
 
-      <form (ngSubmit)="saveEdit()">
-
+      <form (ngSubmit)="saveEdit()" class="edit-form">
         <label>
-          Title
+          <span>Title</span>
           <input type="text" [(ngModel)]="editLocal.title" name="title" />
         </label>
 
         <label>
-          Address
+          <span>Address</span>
           <input type="text" [(ngModel)]="editLocal.address" name="address" />
         </label>
 
         <label>
-          Description
+          <span>Description</span>
           <textarea [(ngModel)]="editLocal.description" name="description"></textarea>
         </label>
 
         <label>
-          Price
+          <span>Price</span>
           <input type="number" [(ngModel)]="editLocal.price" name="price" />
         </label>
 
         <label>
-          Availability
+          <span>Availability</span>
           <select [(ngModel)]="editLocal.availability" name="availability">
             <option [ngValue]="1">Available</option>
-            <option [ngValue]="0">Not Available</option>
+            <option [ngValue]="0">Not available</option>
           </select>
         </label>
 
-        <button type="submit" class="view-btn" (click)="saveEdit()">Save</button>
+        <button type="submit" class="primary-btn">Save changes</button>
       </form>
-
     </div>
   </div>
-
 </div>

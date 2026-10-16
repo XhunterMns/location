@@ -1,0 +1,11 @@
+{
+  "routes": [
+    "/admin",
+    "/landlord",
+    "/landlord/add",
+    "/login",
+    "/profile",
+    "/renter",
+    "/signup"
+  ]
+}

@@ -1,0 +1,40 @@
+<section class="profile-page">
+  <div class="profile-card panel-surface">
+    <div class="profile-header">
+      <div>
+        <p class="section-kicker">Account</p>
+        <h1>My profile</h1>
+      </div>
+      <span class="role-badge">{{ currentRole | titlecase }}</span>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">Loading your profile...</div>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+
+    <form *ngIf="!loading" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
+      <div class="form-grid">
+        <label>
+          <span>Full name</span>
+          <input type="text" formControlName="name" placeholder="Your name" />
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type="email" formControlName="email" placeholder="your@email.com" />
+        </label>
+
+        <label class="full-width">
+          <span>New password</span>
+          <input type="password" formControlName="password" placeholder="Leave blank to keep current password" />
+        </label>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="primary-btn" [disabled]="saving">
+          {{ saving ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

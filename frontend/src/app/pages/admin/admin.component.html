@@ -1,0 +1,169 @@
+<div class="admin-container">
+  <nav class="admin-nav">
+    <div class="nav-brand">Admin Dashboard</div>
+    <div class="nav-links">
+      <button [class.active]="activeTab === 'locals'" (click)="setTab('locals')">Manage Locals</button>
+      <button [class.active]="activeTab === 'users'" (click)="setTab('users')">Manage Users</button>
+      <button class="refresh-btn" (click)="loadData()" [disabled]="loading">
+        <span *ngIf="!loading">🔄 Refresh</span>
+        <span *ngIf="loading">⌛ Loading...</span>
+      </button>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <main class="admin-content">
+    <div *ngIf="loading" class="loading-state">
+      <p>Loading data...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+      <button (click)="loadData()">Retry</button>
+    </div>
+
+    <div class="search-box admin-search" *ngIf="!loading">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        placeholder="Search users or locals"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value"
+      />
+    </div>
+
+    <!-- Manage Locals Tab -->
+    <section *ngIf="!loading && activeTab === 'locals'">
+      <h2>Locals Management</h2>
+      <div class="local-card-grid" *ngIf="filteredLocals.length > 0; else noLocals">
+        <article class="local-admin-card" *ngFor="let local of filteredLocals">
+          <img *ngIf="local.cover_image; else noLocalImage" [src]="local.cover_image" [alt]="local.title" class="local-card-image" />
+          <ng-template #noLocalImage>
+            <div class="local-card-image placeholder">No image</div>
+          </ng-template>
+
+          <div class="local-card-body">
+            <div class="local-card-head">
+              <div>
+                <p class="local-id">#{{ local.id }}</p>
+                <h3>{{ local.title }}</h3>
+              </div>
+              <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : 'active'">
+                {{ local.is_reserved ? 'reserved' : 'active' }}
+              </span>
+            </div>
+
+            <p class="local-meta"><strong>Address:</strong> {{ local.address }}</p>
+            <p class="local-meta"><strong>Price:</strong> {{ local.price }} DH</p>
+            <p class="local-meta"><strong>Landlord:</strong> {{ local.landlord_email || 'Unknown' }}</p>
+
+            <div class="action-buttons">
+              <button class="btn-edit" (click)="editLocal(local)" title="Edit">✏️ Edit</button>
+              <button class="btn-delete" (click)="deleteLocal(local.id)" title="Delete">🗑️ Delete</button>
+            </div>
+          </div>
+        </article>
+      </div>
+      <ng-template #noLocals>
+        <div class="empty-state">
+          <p>No locals found for evaluation.</p>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- Manage Users Tab -->
+    <section *ngIf="!loading && activeTab === 'users'">
+      <h2>User Management</h2>
+      <div class="table-responsive" *ngIf="filteredUsers.length > 0; else noUsers">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of filteredUsers">
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-edit" (click)="editUser(user)">Edit</button>
+                  <button class="btn-delete" (click)="deleteUser(user.id)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <ng-template #noUsers>
+        <div class="empty-state">
+          <p>No users found in the system.</p>
+        </div>
+      </ng-template>
+    </section>
+  </main>
+
+  <!-- Edit Local Modal -->
+  <div class="modal" *ngIf="editingLocal">
+    <div class="modal-content">
+      <h3>Edit Local</h3>
+      <form (ngSubmit)="saveLocal()">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" [(ngModel)]="editingLocal.title" name="title">
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input type="text" [(ngModel)]="editingLocal.address" name="address">
+        </div>
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" [(ngModel)]="editingLocal.price" name="price">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="editingLocal.description" name="description" rows="4"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" class="btn-cancel" (click)="editingLocal = null">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal" *ngIf="editingUser">
+    <div class="modal-content">
+      <h3>Edit User</h3>
+      <form (ngSubmit)="saveUser()">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" [(ngModel)]="editingUser.name" name="name">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="editingUser.email" name="email">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select [(ngModel)]="editingUser.role" name="role">
+            <option value="landlord">Landlord</option>
+            <option value="renter">Renter</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" class="btn-cancel" (click)="editingUser = null">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,130 +1,205 @@
-<div class="renter-page">
-  <div class="page-overlay"></div>
+<div class="renter-shell">
+  <header class="renter-hero panel-surface">
+    <div>
+      <span class="eyebrow dark">Renter dashboard</span>
+      <h1>Discover homes that fit your lifestyle.</h1>
+      <p>Review verified rentals, track reservations, and keep all your booking details in one place.</p>
+    </div>
 
-  <div class="renter-content">
-    <section class="hero-card glass-card">
-      <div>
-        <h1>Renter Dashboard</h1>
-        <p>Reserve a local and leave an evaluation after your stay.</p>
-      </div>
-      <div class="stats-chip">
+    <div class="hero-metrics">
+      <div class="metric-card">
         <strong>{{ locals.length }}</strong>
-        <span>available locals</span>
+        <span>Available</span>
       </div>
-    </section>
+      <div class="metric-card">
+        <strong>{{ reservations.length }}</strong>
+        <span>Booked</span>
+      </div>
+    </div>
+  </header>
 
-    <section class="glass-card reservations-panel">
-      <div class="section-heading">
-        <h2>My Reservations</h2>
-        <span>{{ reservations.length }} total</span>
+  <section class="panel-surface reservations-panel">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Your trips</p>
+        <h2>My reservations</h2>
+      </div>
+      <span class="pill-count">{{ filteredReservations.length }} total</span>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        placeholder="Search reservations or properties"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value"
+      />
+    </div>
+
+    <p class="error-message" *ngIf="reservationsError">{{ reservationsError }}</p>
+
+    <div class="reservations-list" *ngIf="!reservationsError && filteredReservations.length; else noReservations">
+      <article class="reservation-item" *ngFor="let reservation of filteredReservations">
+        <img *ngIf="reservation.cover_image" [src]="reservation.cover_image" [alt]="reservation.title" class="reservation-image" (click)="openZoom(reservation.cover_image)" />
+
+        <div class="reservation-copy">
+          <h3>{{ reservation.title }}</h3>
+          <p>{{ reservation.address }}</p>
+          <p>{{ reservation.start_date | date:'mediumDate' }} to {{ reservation.end_date | date:'mediumDate' }}</p>
+        </div>
+
+        <span class="status-pill">{{ reservation.status }}</span>
+
+        <div class="button-group">
+          <button class="secondary-action" title="Proceed to Payment">Pay</button>
+          <button class="danger-action" (click)="delete(reservation.id)" title="Cancel Reservation">Delete</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <p class="error-message" *ngIf="pageError">{{ pageError }}</p>
+  <p class="loading-copy" *ngIf="loading">Loading available rentals...</p>
+
+  <section class="properties-panel">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Explore</p>
+        <h2>Available properties</h2>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="cityFilter">City</label>
+        <select id="cityFilter" [value]="cityFilter" (change)="cityFilter = $any($event.target).value">
+          <option value="">All Tunisian cities</option>
+          <option *ngFor="let city of tunisianCities" [value]="city">{{ city }}</option>
+        </select>
       </div>
 
-      <p class="error-message" *ngIf="reservationsError">{{ reservationsError }}</p>
+      <div class="filter-field">
+        <label for="priceSort">Price</label>
+        <select id="priceSort" [value]="priceSort" (change)="priceSort = $any($event.target).value || ''">
+          <option value="">Default</option>
+          <option value="asc">Lowest to highest</option>
+          <option value="desc">Highest to lowest</option>
+        </select>
+      </div>
+    </div>
 
-      <div class="reservations-list" *ngIf="!reservationsError && reservations.length; else noReservations">
-        <article class="reservation-item" *ngFor="let reservation of reservations">
-          <img *ngIf="reservation.cover_image"
-          [src]="reservation.cover_image"
-          [alt]="reservation.title"
-          class="reservation-image"
-          (click)="openZoom(reservation.cover_image)" />
-          <div class="reservation-copy">
-            <h3>{{ reservation.title }}</h3>
-            <p>{{ reservation.address }}</p>
-            <p>
-              {{ reservation.start_date | date:'mediumDate' }} to
-              {{ reservation.end_date | date:'mediumDate' }}
-            </p>
+    <div class="locals-grid" *ngIf="!loading && !pageError && filteredLocals.length; else emptyState">
+      <article class="local-card panel-surface" *ngFor="let local of filteredLocals">
+        <img *ngIf="local.cover_image" [src]="local.cover_image" [alt]="local.title" class="cover-image" (click)="openZoom(local.cover_image)" />
+
+        <div class="local-copy">
+          <div class="local-header-row">
+            <h3>{{ local.title }}</h3>
+            <span class="price-tag">{{ local.price }} TND</span>
           </div>
-          <span class="status-pill">{{ reservation.status }}</span>
-          <div class="button-group">
-            <button class="pay-btn" title="Proceed to Payment">💳 Pay</button>
-            <button class="delete-btn" (click)="delete(reservation.id)" title="Cancel Reservation">🗑️ Delete</button>
+          <div class="tag-row">
+            <span class="type-tag" *ngIf="local.is_colocation">Colocation</span>
+            <span class="type-tag neutral" *ngIf="!local.is_colocation">Maison</span>
           </div>
-        </article>
-      </div>
-    </section>
-
-    <p class="error-message" *ngIf="pageError">{{ pageError }}</p>
-    <p class="loading-copy" *ngIf="loading">Loading locals...</p>
-
-    <div class="locals-grid" *ngIf="!loading && !pageError && locals.length; else emptyState">
-      <article class="local-card glass-card" *ngFor="let local of locals">
-<!-- CLICK IMAGE TO ZOOM -->
-<img *ngIf="local.cover_image"
-     [src]="local.cover_image"
-     [alt]="local.title"
-     class="cover-image"
-     (click)="openZoom(local.cover_image)" />        <div class="local-copy">
-          <h3>{{ local.title }}</h3>
-          <p>{{ local.address }}</p>
-          <p class="landlord-name">Owner: {{ local.landlord_name || 'Unknown' }}</p>
-          <p class="price">{{ local.price }} TND</p>
-          <p class="evaluation">
-            ⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : 'New' }}
-            ({{ local.total_reviews || 0 }} reviews)
+          <p class="address-line">{{ local.address }}</p>
+          <p class="owner-line">Owner: {{ local.landlord_name || 'Unknown' }}</p>
+          <p class="rating-line">
+            <span>⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : 'New' }}</span>
+            <span>({{ local.total_reviews || 0 }} reviews)</span>
           </p>
         </div>
-        <button class="view-btn" type="button" (click)="view(local)" title="View details and reserve">🏠 Reserve / Evaluate</button>
+
+        <button class="primary-btn-small" type="button" (click)="view(local)">Reserve / review</button>
       </article>
     </div>
 
     <ng-template #emptyState>
-      <section class="glass-card empty-state" *ngIf="!pageError">
-        <h3>No locals available right now</h3>
-        <p>Check back later for new places to reserve.</p>
-      </section>
+      <div class="panel-surface empty-state" *ngIf="!pageError">
+        <h3>No properties available right now</h3>
+        <p>New rentals appear here as soon as they are available to book.</p>
+      </div>
     </ng-template>
 
     <ng-template #noReservations>
-      <p class="muted-copy" *ngIf="!reservationsError">You have not reserved any local yet.</p>
+      <p class="muted-copy" *ngIf="!reservationsError">You have not booked any property yet.</p>
     </ng-template>
-  </div>
+  </section>
 
   <div class="view-modal-wrap" *ngIf="selectedLocal">
     <div class="modal-backdrop" (click)="closeView()"></div>
 
-    <section class="view-modal glass-card" role="dialog" aria-modal="true" aria-labelledby="local-title">
+    <section class="view-modal panel-surface" role="dialog" aria-modal="true" aria-labelledby="local-title">
       <button class="close-btn" type="button" (click)="closeView()" aria-label="Close">x</button>
 
       <div class="modal-header">
-        <div>
+        <div class="modal-title-box">
+          <p class="section-kicker">Property details</p>
           <h2 id="local-title">{{ selectedLocal.title }}</h2>
-          <p>{{ selectedLocal.address }}</p>
+          <div class="modal-location-row">
+            <span class="location-pill">{{ selectedLocal.city || 'City not specified' }}</span>
+            <span class="location-pill muted-pill" *ngIf="selectedLocal.delegation">{{ selectedLocal.delegation }}</span>
+          </div>
         </div>
-        <p class="modal-price">{{ selectedLocal.price }} TND</p>
+
+        <div class="modal-price-box">
+          <span>Starting from</span>
+          <p class="modal-price">{{ selectedLocal.price }} TND</p>
+        </div>
       </div>
 
-      <p class="modal-description">
-        {{ selectedLocal.description || 'No description provided for this local yet.' }}
-      </p>
+      <div class="modal-meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Address</span>
+          <strong>{{ selectedLocal.address || 'Address not provided' }}</strong>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Phone</span>
+          <strong>{{ selectedLocal.phone_number || 'Not available' }}</strong>
+        </div>
+      </div>
 
-      <div class="images-block">
-        <p class="section-label">Gallery</p>
+      <div class="contact-actions" *ngIf="selectedLocal.phone_number">
+        <button class="primary-btn-small" type="button" (click)="openWhatsApp(selectedLocal.phone_number)">WhatsApp</button>
+        <button class="secondary-btn" type="button" (click)="callOwner(selectedLocal.phone_number)">Call</button>
+        <button class="secondary-action" type="button" (click)="messageOwner(selectedLocal.phone_number)">Message</button>
+      </div>
+
+      <div class="modal-content-grid">
+        <div class="content-panel description-panel">
+          <h3>Overview</h3>
+          <p class="modal-description">
+            {{ selectedLocal.description || 'No description provided for this local yet.' }}
+          </p>
+        </div>
+
+        <div class="content-panel summary-panel">
+          <h3>Quick facts</h3>
+          <ul class="summary-list">
+            <li><span>City</span><strong>{{ selectedLocal.city || '—' }}</strong></li>
+            <li><span>Delegation</span><strong>{{ selectedLocal.delegation || '—' }}</strong></li>
+            <li><span>Price</span><strong>{{ selectedLocal.price }} TND</strong></li>
+            <li><span>Availability</span><strong>{{ selectedLocal.availability === 1 ? 'Available' : 'Not available' }}</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="image-slider" *ngIf="selectedLocal.images?.length">
+        <button class="nav-btn left" (click)="prevImage()">‹</button>
+
+        <img [src]="selectedLocal.images[currentImageIndex].image_url" [alt]="selectedLocal.title" class="detail-image" />
+
+        <button class="nav-btn right" (click)="nextImage()">›</button>
+      </div>
+
+      <div class="images-block" *ngIf="!selectedLocal.images?.length">
         <p *ngIf="selectedLocal.imagesLoading">Loading images...</p>
-        
-        <p *ngIf="!selectedLocal.imagesLoading && !selectedLocal.images?.length">No images uploaded yet.</p>
+        <p *ngIf="!selectedLocal.imagesLoading">No images uploaded yet.</p>
       </div>
-<!-- ================= IMAGE SLIDER ================= -->
-<div class="image-slider" *ngIf="selectedLocal.images?.length">
 
-  <!-- LEFT ARROW -->
-  <button class="nav-btn left" (click)="prevImage()">‹</button>
-
-  <!-- IMAGE DISPLAY -->
-  <img
-    [src]="selectedLocal.images[currentImageIndex].image_url"
-    [alt]="selectedLocal.title"
-    class="detail-image"
-  />
-
-  <!-- RIGHT ARROW -->
-  <button class="nav-btn right" (click)="nextImage()">›</button>
-
-</div>
       <div class="modal-sections">
         <form class="action-card" [formGroup]="reservationForm" (ngSubmit)="reserveSelectedLocal()">
-          <h3>Reserve This Local</h3>
+          <h3>Reserve this property</h3>
 
           <label>
             <span>Start date</span>
@@ -136,12 +211,12 @@
             <input type="date" formControlName="end_date" />
           </label>
 
-          <button type="submit" class="primary-btn">Reserve</button>
+          <button type="submit" class="primary-btn">Confirm booking</button>
           <p class="feedback-message" *ngIf="reservationMessage">{{ reservationMessage }}</p>
         </form>
 
         <form class="action-card" [formGroup]="evaluationForm" (ngSubmit)="evaluateSelectedLocal()">
-          <h3>Evaluate This Local</h3>
+          <h3>Leave a review</h3>
 
           <label>
             <span>Rating</span>
@@ -159,28 +234,18 @@
             <textarea rows="4" formControlName="comment" placeholder="Share your experience"></textarea>
           </label>
 
-          <button type="submit" class="secondary-btn">Save Evaluation</button>
+          <button type="submit" class="secondary-btn">Save review</button>
           <p class="feedback-message" *ngIf="evaluationMessage">{{ evaluationMessage }}</p>
         </form>
       </div>
     </section>
   </div>
-  <!-- ================= IMAGE ZOOM MODAL ================= -->
-<!-- This modal shows clicked image in full screen -->
 
-<div class="image-zoom-wrap" *ngIf="zoomImage">
-  <!-- dark background -->
-  <div class="zoom-backdrop" (click)="closeZoom()"></div>
-
-  <!-- zoomed image container -->
-  <div class="zoom-box">
-    <!-- close button -->
-    <button class="zoom-close" (click)="closeZoom()">x</button>
-
-    <!-- big image -->
-    <img [src]="zoomImage" alt="Zoomed image" />
+  <div class="image-zoom-wrap" *ngIf="zoomImage">
+    <div class="zoom-backdrop" (click)="closeZoom()"></div>
+    <div class="zoom-box">
+      <button class="zoom-close" (click)="closeZoom()">×</button>
+      <img [src]="zoomImage" alt="Zoomed image" />
+    </div>
   </div>
-</div>
-
-
 </div>

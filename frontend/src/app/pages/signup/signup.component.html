@@ -1,0 +1,55 @@
+<div class="auth-shell">
+  <div class="auth-visual" aria-hidden="true">
+    <div class="brand-block">
+      <span class="eyebrow">Join Location</span>
+      <h1>Start listing or renting with confidence.</h1>
+      <p>Build your rental profile, connect with trusted renters or landlords, and keep your property journey organized.</p>
+    </div>
+
+    <ul class="feature-list">
+      <li>Flexible landlord and renter access</li>
+      <li>Clear booking and approval flow</li>
+      <li>Professional shortlist management</li>
+    </ul>
+  </div>
+
+  <div class="auth-panel" @fade>
+    <div class="panel-header">
+      <div class="mini-logo">
+        <span>L</span>
+      </div>
+      <p class="eyebrow subtle">Create account</p>
+      <h2>Get started</h2>
+    </div>
+
+    <form class="auth-form" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <label class="field">
+        <span>Full name</span>
+        <input type="text" name="name" placeholder="Your full name" formControlName="name">
+      </label>
+
+      <label class="field">
+        <span>Email address</span>
+        <input type="email" name="email" placeholder="you@example.com" formControlName="email">
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" name="password" placeholder="Create a secure password" formControlName="password">
+      </label>
+
+      <label class="field">
+        <span>I am joining as</span>
+        <select formControlName="role">
+          <option value="" disabled>Select your role</option>
+          <option value="renter">Renter</option>
+          <option value="landlord">Landlord</option>
+        </select>
+      </label>
+
+      <button type="submit" class="primary-btn">Create account</button>
+    </form>
+
+    <p class="switch-copy">Already have an account? <a routerLink="/login">Sign in</a></p>
+  </div>
+</div>

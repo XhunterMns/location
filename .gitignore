@@ -41,3 +41,19 @@ testem.log
 .DS_Store
 Thumbs.db
 
+.env
+backend/.env
+# Angular cache
+/frontend/.angular/
+
+# Dependencies
+/frontend/node_modules/
+/backend/node_modules/
+
+# Build outputs
+/frontend/dist/
+/backend/dist/
+
+# Environment files
+.env.*
+!.env.example

@@ -1,0 +1,18 @@
+const express = require('express');
+const propertyController = require('../controllers/property.controller');
+const userController = require('../controllers/user.controller');
+const { verifyToken } = require('../middleware/auth.middleware');
+const { requireRole } = require('../middleware/role.middleware');
+
+const router = express.Router();
+
+router.get('/admin/locals', verifyToken, requireRole('admin'), propertyController.adminListLocals);
+router.put('/admin/locals/:id/status', verifyToken, requireRole('admin'), propertyController.adminUpdateLocalStatus);
+router.put('/admin/locals/:id', verifyToken, requireRole('admin'), propertyController.adminUpdateLocal);
+router.delete('/admin/locals/:id', verifyToken, requireRole('admin'), propertyController.adminDeleteLocal);
+
+router.get('/admin/users', verifyToken, requireRole('admin'), userController.getUsers);
+router.put('/admin/users/:id', verifyToken, requireRole('admin'), userController.updateUserById);
+router.delete('/admin/users/:id', verifyToken, requireRole('admin'), userController.deleteUserById);
+
+module.exports = router;

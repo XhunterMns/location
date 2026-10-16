@@ -1,0 +1,25 @@
+const { get } = require('./env');
+
+const APP_CONFIG = {
+  port: Number(get('PORT', 3000)),
+  jwtSecret: get('JWT_SECRET', 'secret123'),
+  bcryptRounds: Number(get('BCRYPT_ROUNDS', 10)),
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+};
+
+const DB_CONFIG = {
+  host: get('DB_HOST', 'localhost'),
+  user: get('DB_USER', 'root'),
+  password: get('DB_PASSWORD', ''),
+  database: get('DB_NAME', 'location_db'),
+  waitForConnections: true,
+  connectionLimit: Number(get('DB_CONNECTION_LIMIT', 10)),
+};
+
+module.exports = {
+  APP_CONFIG,
+  DB_CONFIG,
+};

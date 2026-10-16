@@ -24,9 +24,43 @@ export class AdminComponent implements OnInit {
   activeTab: 'locals' | 'users' = 'locals';
   loading = false;
   errorMessage = '';
-  
+  searchTerm = '';
+
   editingUser: any = null;
   editingLocal: any = null;
+
+  get filteredLocals(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.locals;
+
+    return this.locals.filter((local) => {
+      const fields = [
+        local?.title,
+        local?.address,
+        local?.status,
+        local?.landlord_email,
+        local?.price?.toString()
+      ];
+
+      return fields.some((value) => String(value ?? '').toLowerCase().includes(term));
+    });
+  }
+
+  get filteredUsers(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.users;
+
+    return this.users.filter((user) => {
+      const fields = [
+        user?.name,
+        user?.email,
+        user?.role,
+        user?.id?.toString()
+      ];
+
+      return fields.some((value) => String(value ?? '').toLowerCase().includes(term));
+    });
+  }
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -58,10 +92,6 @@ export class AdminComponent implements OnInit {
 
   setTab(tab: 'locals' | 'users') {
     this.activeTab = tab;
-  }
-
-  updateStatus(id: number, status: 'approved' | 'rejected') {
-    this.adminService.updateLocalStatus(id, status).subscribe(() => this.loadData());
   }
 
   deleteLocal(id: number) {

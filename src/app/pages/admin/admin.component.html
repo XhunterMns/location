@@ -22,43 +22,47 @@
       <button (click)="loadData()">Retry</button>
     </div>
 
+    <div class="search-box admin-search" *ngIf="!loading">
+      <span class="search-icon">⌕</span>
+      <input
+        type="text"
+        placeholder="Search users or locals"
+        [value]="searchTerm"
+        (input)="searchTerm = $any($event.target).value"
+      />
+    </div>
+
     <!-- Manage Locals Tab -->
     <section *ngIf="!loading && activeTab === 'locals'">
       <h2>Locals Management</h2>
-      <div class="table-responsive" *ngIf="locals.length > 0; else noLocals">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Address</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Landlord</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let local of locals">
-              <td>{{ local.id }}</td>
-              <td>{{ local.title }}</td>
-              <td>{{ local.address }}</td>
-              <td>{{ local.price }} DH</td>
-              <td>
-                <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : local.status">
-                  {{ local.is_reserved ? 'reserved' : local.status }}
-                </span>
-              </td>
-              <td>{{ local.landlord_email }}</td>
-              <td class="action-buttons">
-                <button class="btn-approve" (click)="updateStatus(local.id, 'approved')" title="Approve">✅ Approve</button>
-                <button class="btn-reject" (click)="updateStatus(local.id, 'rejected')" title="Reject">❌ Reject</button>
-                <button class="btn-edit" (click)="editLocal(local)" title="Edit">✏️ Edit</button>
-                <button class="btn-delete" (click)="deleteLocal(local.id)" title="Delete">🗑️ Delete</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="local-card-grid" *ngIf="filteredLocals.length > 0; else noLocals">
+        <article class="local-admin-card" *ngFor="let local of filteredLocals">
+          <img *ngIf="local.cover_image; else noLocalImage" [src]="local.cover_image" [alt]="local.title" class="local-card-image" />
+          <ng-template #noLocalImage>
+            <div class="local-card-image placeholder">No image</div>
+          </ng-template>
+
+          <div class="local-card-body">
+            <div class="local-card-head">
+              <div>
+                <p class="local-id">#{{ local.id }}</p>
+                <h3>{{ local.title }}</h3>
+              </div>
+              <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : 'active'">
+                {{ local.is_reserved ? 'reserved' : 'active' }}
+              </span>
+            </div>
+
+            <p class="local-meta"><strong>Address:</strong> {{ local.address }}</p>
+            <p class="local-meta"><strong>Price:</strong> {{ local.price }} DH</p>
+            <p class="local-meta"><strong>Landlord:</strong> {{ local.landlord_email || 'Unknown' }}</p>
+
+            <div class="action-buttons">
+              <button class="btn-edit" (click)="editLocal(local)" title="Edit">✏️ Edit</button>
+              <button class="btn-delete" (click)="deleteLocal(local.id)" title="Delete">🗑️ Delete</button>
+            </div>
+          </div>
+        </article>
       </div>
       <ng-template #noLocals>
         <div class="empty-state">
@@ -70,7 +74,7 @@
     <!-- Manage Users Tab -->
     <section *ngIf="!loading && activeTab === 'users'">
       <h2>User Management</h2>
-      <div class="table-responsive" *ngIf="users.length > 0; else noUsers">
+      <div class="table-responsive" *ngIf="filteredUsers.length > 0; else noUsers">
         <table>
           <thead>
             <tr>
@@ -82,7 +86,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of users">
+            <tr *ngFor="let user of filteredUsers">
               <td>{{ user.id }}</td>
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
@@ -125,14 +129,6 @@
         <div class="form-group">
           <label>Description</label>
           <textarea [(ngModel)]="editingLocal.description" name="description" rows="4"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select [(ngModel)]="editingLocal.status" name="status">
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
         </div>
         <div class="modal-actions">
           <button type="submit" class="btn-save">Save Changes</button>

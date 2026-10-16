@@ -18,10 +18,28 @@ export class LandlordComponent {
   locals: any[] = [];
   selectedLocal: any | null = null;
   editLocal: any = null;
+  searchTerm = '';
   authService = inject(AuthService);
   router = inject(Router);
 
   constructor(private service: LandlordService, @Inject(PLATFORM_ID) private platformId: Object) { }
+
+  get filteredLocals(): any[] {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return this.locals;
+
+    return this.locals.filter((local) => {
+      const fields = [
+        local?.title,
+        local?.address,
+        local?.status,
+        local?.price?.toString(),
+        local?.description
+      ];
+
+      return fields.some((value) => String(value ?? '').toLowerCase().includes(term));
+    });
+  }
 
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;

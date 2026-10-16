@@ -1,0 +1,49 @@
+<div class="auth-shell">
+  <div class="auth-visual" aria-hidden="true">
+    <div class="brand-block">
+      <span class="eyebrow">Premium rentals</span>
+      <h1>Find the next place that feels like home.</h1>
+      <p>Browse verified properties, book with confidence, and manage your rental journey in one trusted platform.</p>
+    </div>
+
+    <ul class="feature-list">
+      <li>Verified homes and local owners</li>
+      <li>Simple reservation workflow</li>
+      <li>Reliable landlord communication</li>
+    </ul>
+  </div>
+
+  <div class="auth-panel" @fade>
+    <div class="panel-header">
+      <div class="mini-logo">
+        <span>L</span>
+      </div>
+      <p class="eyebrow subtle">Welcome back</p>
+      <h2>Sign in</h2>
+    </div>
+
+    <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <label class="field">
+        <span>Email address</span>
+        <input name="email" type="email" formControlName="email" placeholder="you@example.com">
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" formControlName="password" placeholder="Enter your password">
+      </label>
+
+      <div class="options-row">
+        <label class="checkbox-row">
+          <input type="checkbox">
+          <span>Remember me</span>
+        </label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="primary-btn">Login</button>
+    </form>
+
+    <p class="switch-copy">Need an account? <a routerLink="/signup">Create one</a></p>
+  </div>
+</div>

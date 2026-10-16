@@ -19,12 +19,25 @@ export class AddLocalComponent {
   uploadError = '';
   private readonly maxFileSizeMb = 5;
   private readonly maxFilesPerUpload = 6;
+  readonly tunisianCities = [
+    'Tunis', 'Sfax', 'Sousse', 'Monastir', 'Kairouan', 'Bizerte', 'Nabeul', 'Gabès', 'Ben Arous',
+    'Ariana', 'Gafsa', 'Tozeur', 'Kasserine', 'Médenine', 'Mahdia', 'Jendouba', 'Manouba',
+    'Kébili', 'Siliana', 'Zaghouan', 'Beja', 'Tataouine'
+  ];
 
   public localForm = new FormGroup({
     title: new FormControl('', [Validators.required]),
     address: new FormControl('', [Validators.required]),
+    city: new FormControl('Tunis', [Validators.required]),
+    delegation: new FormControl('', [Validators.required]),
+    phone_number: new FormControl('', [Validators.required, Validators.minLength(8)]),
     description: new FormControl('', []),
-    price: new FormControl(0, [Validators.required])
+    price: new FormControl(0, [Validators.required]),
+    is_colocation: new FormControl(false),
+    room_type: new FormControl('private room'),
+    available_places: new FormControl(1),
+    gender_preference: new FormControl('no preference'),
+    colocation_rules: new FormControl('')
   });
 
   async submit() {
