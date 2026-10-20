@@ -1,11 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import { API_BASE_URL } from '../api.config';
 
 @Injectable({ providedIn: 'root' })
 export class LandlordService {
 
-  baseUrl = '/api';
+  baseUrl = API_BASE_URL;
 
   constructor(private http: HttpClient, private auth: AuthService) {}
 

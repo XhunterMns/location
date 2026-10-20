@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
   private http = inject(HttpClient);
-  private baseUrl = '/api/admin';
+  private baseUrl = `${API_BASE_URL}/admin`;
 
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/users`);
