@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs/operators';
+import { API_BASE_URL } from '../api.config';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class AuthService {
   constructor() { }
 
   httpClient = inject(HttpClient);
-  baseUrl = '/api';
+  baseUrl = API_BASE_URL;
 
   private hasStorage() {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
