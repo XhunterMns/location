@@ -25,7 +25,11 @@ const PORT = process.env.PORT || 3000;
 
 ensureDatabaseSchema()
   .then(() => {
-    app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+    const port = Number(process.env.PORT || PORT || 3000);
+
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`Server running on port ${port}`);
+    });
   })
   .catch((error) => {
     console.error('Startup failed:', error);
