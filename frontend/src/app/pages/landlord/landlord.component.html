@@ -9,6 +9,37 @@
     <button class="add-btn" routerLink="/landlord/add">+ Add listing</button>
   </header>
 
+  <section class="notifications-panel panel-surface">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Alerts</p>
+        <h2>Reservation notifications</h2>
+      </div>
+      <div class="notifications-actions">
+        <span class="pill-count" *ngIf="notifications.length">{{ notifications.length }} new</span>
+        <button type="button" class="refresh-btn" (click)="loadNotifications()">Refresh</button>
+      </div>
+    </div>
+
+    <ul class="notification-list" *ngIf="notifications.length; else noNotifications">
+      <li *ngFor="let note of notifications.slice(0, 5)" class="notification-item">
+        <div class="notification-dot"></div>
+        <div>
+          <strong>{{ note.title }}</strong>
+          <p>{{ note.message }}</p>
+          <small>{{ note.created_at | date:'medium' }}</small>
+        </div>
+      </li>
+    </ul>
+
+    <ng-template #noNotifications>
+      <div class="empty-notifications">
+        <h3>No alerts yet</h3>
+        <p>New reservation requests will appear here once a renter books one of your properties.</p>
+      </div>
+    </ng-template>
+  </section>
+
   <section class="listings-panel panel-surface">
     <div class="section-title-row">
       <div>

@@ -11,10 +11,10 @@ const APP_CONFIG = {
 };
 
 const DB_CONFIG = {
-  host: get('DB_HOST', 'mysql.railway.internal'),
-  port: Number(get('DB_PORT', 3306)),
+  host: get('DB_HOST', 'localhost'),
+//  port: Number(get('DB_PORT', 3306)),
   user: get('DB_USER', 'root'),
-  password: get('DB_PASSWORD', 'DftSOreSJtAUzKGjcrUiYblykaUfonQb'),
+  password: get('DB_PASSWORD', ''),
   database: get('DB_NAME', 'location_db'),
   waitForConnections: true,
   connectionLimit: Number(get('DB_CONNECTION_LIMIT', 10)),

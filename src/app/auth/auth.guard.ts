@@ -18,6 +18,10 @@ export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return true;
+  }
+
   if (!authService.isLoggedIn()) {
     router.navigate(['/login']);
     return false;
@@ -35,6 +39,10 @@ export const landlordGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return true;
+  }
+
   if (!authService.isLoggedIn()) {
     router.navigate(['/login']);
     return false;
@@ -51,6 +59,10 @@ export const landlordGuard: CanActivateFn = (route, state) => {
 export const renterGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return true;
+  }
 
   if (!authService.isLoggedIn()) {
     router.navigate(['/login']);

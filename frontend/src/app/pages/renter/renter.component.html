@@ -52,7 +52,7 @@
         <span class="status-pill">{{ reservation.status }}</span>
 
         <div class="button-group">
-          <button class="secondary-action" title="Proceed to Payment">Pay</button>
+          
           <button class="danger-action" (click)="delete(reservation.id)" title="Cancel Reservation">Delete</button>
         </div>
       </article>
@@ -80,6 +80,15 @@
       </div>
 
       <div class="filter-field">
+        <label for="leaseTypeFilter">Lease type</label>
+        <select id="leaseTypeFilter" [value]="leaseTypeFilter" (change)="leaseTypeFilter = $any($event.target).value || 'all'">
+          <option value="all">All listings</option>
+          <option value="colocation">Colocation</option>
+          <option value="individual">Individual lease</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
         <label for="priceSort">Price</label>
         <select id="priceSort" [value]="priceSort" (change)="priceSort = $any($event.target).value || ''">
           <option value="">Default</option>
@@ -100,9 +109,10 @@
           </div>
           <div class="tag-row">
             <span class="type-tag" *ngIf="local.is_colocation">Colocation</span>
-            <span class="type-tag neutral" *ngIf="!local.is_colocation">Maison</span>
+            <span class="type-tag neutral" *ngIf="!local.is_colocation">Individual lease</span>
           </div>
-          <p class="address-line">{{ local.address }}</p>
+          <p class="address-line location-highlight">📍 {{ getLocationLabel(local) }}</p>
+          <p class="address-line address-detail">{{ local.address }}</p>
           <p class="owner-line">Owner: {{ local.landlord_name || 'Unknown' }}</p>
           <p class="rating-line">
             <span>⭐ {{ local.evaluation ? (local.evaluation | number:'1.1-1') : 'New' }}</span>
@@ -139,6 +149,7 @@
           <div class="modal-location-row">
             <span class="location-pill">{{ selectedLocal.city || 'City not specified' }}</span>
             <span class="location-pill muted-pill" *ngIf="selectedLocal.delegation">{{ selectedLocal.delegation }}</span>
+            <span class="location-pill muted-pill">{{ getCountry(selectedLocal) }}</span>
           </div>
         </div>
 
@@ -178,6 +189,7 @@
           <ul class="summary-list">
             <li><span>City</span><strong>{{ selectedLocal.city || '—' }}</strong></li>
             <li><span>Delegation</span><strong>{{ selectedLocal.delegation || '—' }}</strong></li>
+            <li><span>Country</span><strong>{{ getCountry(selectedLocal) }}</strong></li>
             <li><span>Price</span><strong>{{ selectedLocal.price }} TND</strong></li>
             <li><span>Availability</span><strong>{{ selectedLocal.availability === 1 ? 'Available' : 'Not available' }}</strong></li>
           </ul>
