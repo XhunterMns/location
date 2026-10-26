@@ -23,6 +23,7 @@ export class RenterComponent {
   evaluationMessage = '';
   searchTerm = '';
   cityFilter = '';
+  leaseTypeFilter: 'all' | 'colocation' | 'individual' = 'all';
   priceSort: 'asc' | 'desc' | '' = '';
   readonly tunisianCities = [
     'Tunis', 'Sfax', 'Sousse', 'Monastir', 'Kairouan', 'Bizerte', 'Nabeul', 'Gabès', 'Ben Arous',
@@ -46,11 +47,26 @@ export class RenterComponent {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
+  getCountry(local: any): string {
+    const country = String(local?.country || local?.country_name || 'Tunisia').trim();
+    return country || 'Tunisia';
+  }
+
+  getLocationLabel(local: any): string {
+    const city = String(local?.city || '').trim();
+    const delegation = String(local?.delegation || '').trim();
+    const country = this.getCountry(local);
+    return [city, delegation, country].filter(Boolean).join(', ');
+  }
+
   get filteredLocals(): any[] {
     const term = this.searchTerm.trim().toLowerCase();
 
     const filtered = this.locals.filter((local) => {
       const cityMatch = !this.cityFilter || String(local?.city || local?.address || '').toLowerCase().includes(this.cityFilter.toLowerCase());
+      const leaseTypeMatch = this.leaseTypeFilter === 'all'
+        || (this.leaseTypeFilter === 'colocation' && Boolean(local?.is_colocation))
+        || (this.leaseTypeFilter === 'individual' && !local?.is_colocation);
       const searchMatch = !term || [
         local?.title,
         local?.address,
@@ -58,10 +74,11 @@ export class RenterComponent {
         local?.description,
         local?.price?.toString(),
         local?.city,
-        local?.delegation
+        local?.delegation,
+        this.getCountry(local)
       ].some((value) => String(value ?? '').toLowerCase().includes(term));
 
-      return cityMatch && searchMatch;
+      return cityMatch && leaseTypeMatch && searchMatch;
     });
 
     if (this.priceSort === 'asc') {

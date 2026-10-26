@@ -16,6 +16,7 @@ import { AuthService } from '../../auth/auth.service';
 export class LandlordComponent {
 
   locals: any[] = [];
+  notifications: any[] = [];
   selectedLocal: any | null = null;
   editLocal: any = null;
   searchTerm = '';
@@ -44,13 +45,18 @@ export class LandlordComponent {
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     this.loadLocals();
+    this.loadNotifications();
   }
-
-
 
   loadLocals() {
     this.service.getMyLocals().subscribe((res: any) => {
       this.locals = res;
+    });
+  }
+
+  loadNotifications() {
+    this.service.getNotifications().subscribe((res: any) => {
+      this.notifications = Array.isArray(res) ? res : [];
     });
   }
 

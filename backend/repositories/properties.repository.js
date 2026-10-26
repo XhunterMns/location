@@ -1,13 +1,14 @@
 const { pool } = require('../db_config/database');
 
-async function createLocal({ title, address, city, delegation, phone_number, description, price, availability, is_colocation = 0, room_type, available_places, gender_preference, colocation_rules, userId, status = 'published' }) {
+async function createLocal({ title, address, city, delegation, country, phone_number, description, price, availability, is_colocation = 0, room_type, available_places, gender_preference, colocation_rules, userId, status = 'published' }) {
   const [result] = await pool.query(
-    'INSERT INTO locals (title, address, city, delegation, phone_number, description, price, availability, is_colocation, room_type, available_places, gender_preference, colocation_rules, user_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO locals (title, address, city, delegation, country, phone_number, description, price, availability, is_colocation, room_type, available_places, gender_preference, colocation_rules, user_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     [
       title,
       address,
       city || null,
       delegation || null,
+      country || 'Tunisia',
       phone_number || null,
       description,
       price,
@@ -72,6 +73,7 @@ async function updateLocalByOwner(id, userId, payload) {
   const {
     title,
     address,
+    country,
     description,
     price,
     availability,
@@ -83,10 +85,11 @@ async function updateLocalByOwner(id, userId, payload) {
   } = payload;
 
   const [result] = await pool.query(
-    'UPDATE locals SET title = ?, address = ?, description = ?, price = ?, availability = ?, is_colocation = ?, room_type = ?, available_places = ?, gender_preference = ?, colocation_rules = ? WHERE id = ? AND user_id = ?',
+    'UPDATE locals SET title = ?, address = ?, country = ?, description = ?, price = ?, availability = ?, is_colocation = ?, room_type = ?, available_places = ?, gender_preference = ?, colocation_rules = ? WHERE id = ? AND user_id = ?',
     [
       title,
       address,
+      country || 'Tunisia',
       description,
       price,
       availability ? 1 : 0,
@@ -216,12 +219,13 @@ async function updateLocalStatusByAdmin(id, status) {
 }
 
 async function updateLocalByAdmin(id, payload) {
-  const { title, address, description, price, availability, status, is_colocation, room_type, available_places, gender_preference, colocation_rules } = payload;
+  const { title, address, country, description, price, availability, status, is_colocation, room_type, available_places, gender_preference, colocation_rules } = payload;
   const [result] = await pool.query(
-    'UPDATE locals SET title=?, address=?, description=?, price=?, availability=?, is_colocation=?, room_type=?, available_places=?, gender_preference=?, colocation_rules=?, status=? WHERE id=?',
+    'UPDATE locals SET title=?, address=?, country=?, description=?, price=?, availability=?, is_colocation=?, room_type=?, available_places=?, gender_preference=?, colocation_rules=?, status=? WHERE id=?',
     [
       title,
       address,
+      country || 'Tunisia',
       description,
       price,
       availability ? 1 : 0,

@@ -100,7 +100,7 @@
           </div>
           <div class="tag-row">
             <span class="type-tag" *ngIf="local.is_colocation">Colocation</span>
-            <span class="type-tag neutral" *ngIf="!local.is_colocation">Maison</span>
+            <span class="type-tag neutral" *ngIf="!local.is_colocation">Individual lease</span>
           </div>
           <p class="address-line">{{ local.address }}</p>
           <p class="owner-line">Owner: {{ local.landlord_name || 'Unknown' }}</p>

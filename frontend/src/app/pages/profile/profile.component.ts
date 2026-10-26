@@ -22,6 +22,7 @@ export class ProfileComponent implements OnInit {
   profileForm = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
+    old_password: new FormControl('', { nonNullable: true }),
     password: new FormControl('', { nonNullable: true })
   });
 
@@ -65,6 +66,14 @@ export class ProfileComponent implements OnInit {
     };
 
     if (value.password && value.password.trim()) {
+      if (!value.old_password || !value.old_password.trim()) {
+        this.errorMessage = 'Please enter your current password before changing your password.';
+        this.successMessage = '';
+        this.saving = false;
+        return;
+      }
+
+      payload.old_password = value.old_password.trim();
       payload.password = value.password.trim();
     }
 
@@ -76,7 +85,7 @@ export class ProfileComponent implements OnInit {
       next: () => {
         this.successMessage = 'Profile updated successfully.';
         this.saving = false;
-        this.profileForm.patchValue({ password: '' });
+        this.profileForm.patchValue({ old_password: '', password: '' });
       },
       error: (err) => {
         this.errorMessage = err?.error?.message || 'Unable to update your profile.';

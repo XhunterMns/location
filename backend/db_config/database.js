@@ -23,6 +23,7 @@ async function ensureLocalsTable() {
         address VARCHAR(255) NOT NULL,
         city VARCHAR(80) DEFAULT NULL,
         delegation VARCHAR(80) DEFAULT NULL,
+        country VARCHAR(80) DEFAULT 'Tunisia',
         phone_number VARCHAR(20) DEFAULT NULL,
         description TEXT,
         price DECIMAL(10,2) NOT NULL,
@@ -40,6 +41,7 @@ async function ensureLocalsTable() {
     `,
     'locals'
   );
+  
 
   const [statusRows] = await pool.query("SHOW COLUMNS FROM locals LIKE 'status'");
   if (statusRows.length === 0) {
@@ -49,6 +51,7 @@ async function ensureLocalsTable() {
   const columnChecks = [
     ['city', "ALTER TABLE locals ADD COLUMN city VARCHAR(80) DEFAULT NULL"],
     ['delegation', "ALTER TABLE locals ADD COLUMN delegation VARCHAR(80) DEFAULT NULL"],
+    ['country', "ALTER TABLE locals ADD COLUMN country VARCHAR(80) DEFAULT 'Tunisia'"],
     ['phone_number', "ALTER TABLE locals ADD COLUMN phone_number VARCHAR(20) DEFAULT NULL"],
     ['is_colocation', "ALTER TABLE locals ADD COLUMN is_colocation TINYINT(1) DEFAULT 0"],
     ['room_type', "ALTER TABLE locals ADD COLUMN room_type VARCHAR(40) DEFAULT NULL"],
@@ -118,6 +121,27 @@ async function ensureEvaluationsTable() {
   );
 }
 
+async function ensureNotificationsTable() {
+  await ensureTable(
+    `
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        type VARCHAR(50) DEFAULT 'reservation',
+        reference_id INT DEFAULT NULL,
+        reference_type VARCHAR(50) DEFAULT NULL,
+        is_read TINYINT(1) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_notifications_user_id (user_id),
+        INDEX idx_notifications_is_read (is_read)
+      )
+    `,
+    'notifications'
+  );
+}
+
 async function detectUserColumn(tableName, targetKey, fallback = 'renter_id') {
   const [rows] = await pool.query(
     `
@@ -140,6 +164,7 @@ async function ensureDatabaseSchema() {
   await ensureLocalImagesTable();
   await ensureReservationsTable();
   await ensureEvaluationsTable();
+  await ensureNotificationsTable();
   return { schemaReady: true };
 }
 

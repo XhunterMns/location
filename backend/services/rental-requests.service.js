@@ -1,22 +1,15 @@
-const {
-  getReservationsByUserId,
-  findReservationOverlap,
-  createReservation,
-  deleteReservationById,
-  saveEvaluation,
-  findLocalReservationForUser,
-  getReservationById,
-} = require('../repositories/rental-requests.repository');
-const { getLocalById } = require('../repositories/properties.repository');
+const rentalRequestsRepository = require('../repositories/rental-requests.repository');
+const propertiesRepository = require('../repositories/properties.repository');
+const notificationsRepository = require('../repositories/notifications.repository');
 
 async function getMyReservations(userId) {
-  return getReservationsByUserId(userId);
+  return rentalRequestsRepository.getReservationsByUserId(userId);
 }
 
 async function createRentalRequest({ userId, payload }) {
   const { local_id, start_date, end_date } = payload;
 
-  const local = await getLocalById(local_id);
+  const local = await propertiesRepository.getLocalById(local_id);
   if (!local) {
     throw Object.assign(new Error('Local not available'), { statusCode: 404 });
   }
@@ -25,23 +18,32 @@ async function createRentalRequest({ userId, payload }) {
     throw Object.assign(new Error('Local not available'), { statusCode: 404 });
   }
 
-  const overlap = await findReservationOverlap(local_id, start_date, end_date);
+  const overlap = await rentalRequestsRepository.findReservationOverlap(local_id, start_date, end_date);
   if (overlap) {
     throw Object.assign(new Error('Local already reserved for these dates'), { statusCode: 409 });
   }
 
-  const reservation = await createReservation({
+  const reservation = await rentalRequestsRepository.createReservation({
     localId: local_id,
     userId,
     startDate: start_date,
     endDate: end_date,
   });
 
+  await notificationsRepository.createNotification({
+    userId: local.user_id,
+    title: 'New reservation request',
+    message: `A renter requested your property "${local.title}" from ${start_date} to ${end_date}.`,
+    type: 'reservation',
+    referenceId: reservation.id,
+    referenceType: 'reservation',
+  });
+
   return { message: 'Reservation created', id: reservation.id };
 }
 
 async function deleteRentalRequest({ userId, reservationId }) {
-  const reservation = await getReservationById(reservationId);
+  const reservation = await rentalRequestsRepository.getReservationById(reservationId);
   if (!reservation) {
     throw Object.assign(new Error('Reservation not found'), { statusCode: 404 });
   }
@@ -50,7 +52,7 @@ async function deleteRentalRequest({ userId, reservationId }) {
     throw Object.assign(new Error('Access denied'), { statusCode: 403 });
   }
 
-  const result = await deleteReservationById(reservationId);
+  const result = await rentalRequestsRepository.deleteReservationById(reservationId);
   if (result.affectedRows === 0) {
     throw Object.assign(new Error('Reservation not found'), { statusCode: 404 });
   }
@@ -60,13 +62,13 @@ async function deleteRentalRequest({ userId, reservationId }) {
 
 async function addEvaluation({ userId, payload }) {
   const { local_id, rating, comment } = payload;
-  const reservation = await findLocalReservationForUser(local_id, userId);
+  const reservation = await rentalRequestsRepository.findLocalReservationForUser(local_id, userId);
 
   if (!reservation) {
     throw Object.assign(new Error('Reserve this local before evaluating it'), { statusCode: 403 });
   }
 
-  const result = await saveEvaluation({
+  const result = await rentalRequestsRepository.saveEvaluation({
     localId: local_id,
     userId,
     rating: Number(rating),

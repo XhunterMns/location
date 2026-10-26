@@ -30,6 +30,7 @@ export class AddLocalComponent {
     address: new FormControl('', [Validators.required]),
     city: new FormControl('Tunis', [Validators.required]),
     delegation: new FormControl('', [Validators.required]),
+    country: new FormControl('Tunisia', [Validators.required]),
     phone_number: new FormControl('', [Validators.required, Validators.minLength(8)]),
     description: new FormControl('', []),
     price: new FormControl(0, [Validators.required]),

@@ -1,5 +1,6 @@
 const express = require('express');
 const propertyController = require('../controllers/property.controller');
+const notificationController = require('../controllers/notification.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const { requireRole } = require('../middleware/role.middleware');
 
@@ -18,5 +19,6 @@ router.post(
   propertyController.uploadBinaryImage
 );
 router.get('/locals/:id/images', verifyToken, requireRole('landlord'), propertyController.getOwnerImages);
+router.get('/notifications', verifyToken, requireRole('landlord'), notificationController.listMyNotifications);
 
 module.exports = router;

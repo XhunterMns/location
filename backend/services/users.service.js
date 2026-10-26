@@ -27,7 +27,20 @@ async function getProfileById(userId) {
 }
 
 async function updateUser({ userId, payload }) {
-  const { name, email, role, password } = payload || {};
+  const { name, email, role, password, old_password } = payload || {};
+
+  if (password) {
+    const currentUser = await findUserById(userId);
+    if (!currentUser) {
+      throw Object.assign(new Error('User not found'), { statusCode: 404 });
+    }
+
+    const passwordMatches = await bcrypt.compare(old_password || '', currentUser.password);
+    if (!passwordMatches) {
+      throw Object.assign(new Error('Current password is incorrect'), { statusCode: 401 });
+    }
+  }
+
   const safePayload = {
     ...(name !== undefined ? { name } : {}),
     ...(email !== undefined ? { email } : {}),
