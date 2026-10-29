@@ -1,0 +1,14 @@
+{
+  "name": "@stencil/core/internal/app-globals",
+  "version": "4.43.5",
+  "description": "Used for default app globals.",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    "import": "./index.js",
+    "require": "./index.js"
+  },
+  "type": "module",
+  "private": true,
+  "sideEffects": false
+}

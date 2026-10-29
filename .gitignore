@@ -57,3 +57,8 @@ backend/.env
 # Environment files
 .env.*
 !.env.example
+# Dependencies
+node_modules/
+
+# Generated builds
+dist/

@@ -1,0 +1,6 @@
+{
+	"appId": "com.frontionic.app",
+	"appName": "front-ionic",
+	"webDir": "dist/front-ionic/browser",
+	"bundledWebRuntime": false
+}
