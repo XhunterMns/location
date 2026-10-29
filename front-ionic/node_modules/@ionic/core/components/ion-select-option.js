@@ -1,0 +1,4 @@
+/*!
+ * (C) Ionic http://ionicframework.com - MIT License
+ */
+import{p as t,H as e,h as s,d as o,t as n}from"./p-CHqRYvYm.js";import{b as i}from"./p-DOFCbuQR.js";const r=t(class extends e{constructor(t){super(),!1!==t&&this.__registerHost(),this.__attachShadow(),this.inputId="ion-selopt-"+l++,this.disabled=!1}render(){return s(o,{key:"824730b6c1e4f15b716e91b05840e890af5f1577",role:"option",id:this.inputId,class:i(this)})}get el(){return this}static get style(){return":host{display:none}"}},[1,"ion-select-option",{disabled:[4],value:[8]}]);let l=0;const c=r,p=function(){"undefined"!=typeof customElements&&["ion-select-option"].forEach((t=>{"ion-select-option"===t&&(customElements.get(n(t))||customElements.define(n(t),r))}))};export{c as IonSelectOption,p as defineCustomElement}

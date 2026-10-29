@@ -1,0 +1,119 @@
+{
+  "name": "ionicons",
+  "version": "8.1.0",
+  "description": "Premium icons for Ionic.",
+  "files": [
+    "components/",
+    "dist/",
+    "icons/"
+  ],
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "unpkg": "dist/ionicons/ionicons.esm.js",
+  "jsdelivr": "dist/ionicons/ionicons.esm.js",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./loader": {
+      "types": "./dist/loader/index.d.ts",
+      "import": "./dist/loader/index.js",
+      "require": "./dist/loader/index.cjs.js"
+    },
+    "./components": {
+      "types": "./components/index.d.ts",
+      "import": "./components/index.js"
+    },
+    "./components/ion-icon.js": {
+      "types": "./components/ion-icon.d.ts",
+      "import": "./components/ion-icon.js"
+    },
+    "./icons": {
+      "types": "./icons/index.d.ts",
+      "import": "./icons/index.mjs",
+      "require": "./icons/index.js"
+    },
+    "./dist/ionicons.json": {
+      "default": "./dist/ionicons.json"
+    }
+  },
+  "scripts": {
+    "build": "run-s clean build.*",
+    "build.files": "tsx scripts/build.ts",
+    "build.component": "stencil build",
+    "build.collection": "tsx scripts/collection-copy.ts",
+    "clean": "rimraf dist components icons www",
+    "lint": "npm run prettier -- --write",
+    "prettier": "prettier \"./src/**/*.{html,ts,tsx,js,jsx,scss}\"",
+    "prettier.dry-run": "npm run prettier -- --list-different",
+    "start": "run-s build.files && stencil build --dev --watch --serve",
+    "test": "run-s test.spec test.e2e",
+    "test.spec": "jest",
+    "test.e2e": "playwright test",
+    "test.e2e.install": "playwright install && playwright install-deps"
+  },
+  "dependencies": {
+    "@stencil/core": "^4.43.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.61.1",
+    "@types/fs-extra": "^11.0.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.15.3",
+    "@types/svgo": "^3.0.0",
+    "fs-extra": "^11.3.0",
+    "jest": "^30.0.4",
+    "jest-cli": "^30.0.4",
+    "jest-stencil-runner": "^0.0.20",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.6.2",
+    "puppeteer": "^24.12.0",
+    "rimraf": "^6.0.1",
+    "semver": "^7.7.2",
+    "serve": "^14.2.4",
+    "svgo": "4.0.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  },
+  "keywords": [
+    "icon pack",
+    "ionic",
+    "icon",
+    "svg",
+    "mobile",
+    "web component",
+    "component",
+    "custom element",
+    "material design",
+    "ios"
+  ],
+  "homepage": "http://ionicons.com/",
+  "author": {
+    "name": "Ben Sperry",
+    "web": "https://twitter.com/benjsperry"
+  },
+  "contributors": [
+    {
+      "name": "Adam Bradley",
+      "web": "http://twitter.com/adamdbradley"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ionic-team/ionicons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ionic-team/ionicons/issues"
+  },
+  "license": "MIT",
+  "sideEffects": [
+    "icons/imports/"
+  ],
+  "web-types": "dist/ionic.web-types.json"
+}
