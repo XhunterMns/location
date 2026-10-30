@@ -22,9 +22,14 @@ function loadEnvFile(filePath) {
 }
 
 const envFiles = [
+  '/etc/secrets/.env',
   path.resolve(__dirname, '../../.env'),
   path.resolve(__dirname, '../.env'),
 ];
+
+for (const envFile of envFiles) {
+  loadEnvFile(envFile);
+}
 
 for (const envFile of envFiles) {
   loadEnvFile(envFile);
