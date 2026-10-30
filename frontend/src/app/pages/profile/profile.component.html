@@ -1,45 +1,74 @@
-<section class="profile-page">
-  <div class="profile-card panel-surface">
-    <div class="profile-header">
-      <div>
-        <p class="section-kicker">Account</p>
-        <h1>My profile</h1>
+<ion-content class="ion-padding">
+  <section class="profile-page">
+    <div class="profile-card panel-surface">
+      <div class="profile-header">
+        <div>
+          <p class="section-kicker">Account</p>
+          <h1 class="font-display">My profile</h1>
+          <p class="lead-copy">Update your identity details and password securely.</p>
+        </div>
+        <span class="type-tag">{{ currentRole | titlecase }}</span>
       </div>
-      <span class="role-badge">{{ currentRole | titlecase }}</span>
+
+      <div class="loading-state" *ngIf="loading">Loading your profile…</div>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+
+      <form *ngIf="!loading" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form" novalidate>
+        <div class="form-grid">
+          <label>
+            <span>Full name</span>
+            <input type="text" formControlName="name" placeholder="Your name" autocomplete="name" />
+          </label>
+
+          <label>
+            <span>Email</span>
+            <input type="email" formControlName="email" placeholder="your@email.com" autocomplete="email" />
+          </label>
+
+          <label class="full-width password-field">
+            <span>Current password</span>
+            <input
+              [type]="showCurrentPassword ? 'text' : 'password'"
+              formControlName="old_password"
+              placeholder="Enter your current password"
+              autocomplete="current-password"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="showCurrentPassword = !showCurrentPassword"
+              [attr.aria-label]="showCurrentPassword ? 'Hide current password' : 'Show current password'"
+            >
+              {{ showCurrentPassword ? 'Hide' : 'Show' }}
+            </button>
+          </label>
+
+          <label class="full-width password-field">
+            <span>New password</span>
+            <input
+              [type]="showNewPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Leave blank to keep current password"
+              autocomplete="new-password"
+            />
+            <button
+              class="password-toggle"
+              type="button"
+              (click)="showNewPassword = !showNewPassword"
+              [attr.aria-label]="showNewPassword ? 'Hide new password' : 'Show new password'"
+            >
+              {{ showNewPassword ? 'Hide' : 'Show' }}
+            </button>
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-btn" [disabled]="saving">
+            {{ saving ? 'Saving…' : 'Save changes' }}
+          </button>
+        </div>
+      </form>
     </div>
-
-    <div class="loading-state" *ngIf="loading">Loading your profile...</div>
-    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
-    <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
-
-    <form *ngIf="!loading" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="profile-form">
-      <div class="form-grid">
-        <label>
-          <span>Full name</span>
-          <input type="text" formControlName="name" placeholder="Your name" />
-        </label>
-
-        <label>
-          <span>Email</span>
-          <input type="email" formControlName="email" placeholder="your@email.com" />
-        </label>
-
-        <label class="full-width">
-          <span>Current password</span>
-          <input type="password" formControlName="old_password" placeholder="Enter your current password" />
-        </label>
-
-        <label class="full-width">
-          <span>New password</span>
-          <input type="password" formControlName="password" placeholder="Leave blank to keep current password" />
-        </label>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="primary-btn" [disabled]="saving">
-          {{ saving ? 'Saving...' : 'Save changes' }}
-        </button>
-      </div>
-    </form>
-  </div>
-</section>
+  </section>
+</ion-content>

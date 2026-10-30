@@ -29,4 +29,15 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.logo')?.textContent).toContain('Location');
   });
+
+  it('should point to the local backend during local development', async () => {
+    const { getApiBaseUrl } = await import('./api.config');
+    expect(getApiBaseUrl('localhost')).toBe('http://localhost:3000/api');
+    expect(getApiBaseUrl('127.0.0.1')).toBe('http://localhost:3000/api');
+  });
+
+  it('should keep a production backend URL outside local development', async () => {
+    const { getApiBaseUrl } = await import('./api.config');
+    expect(getApiBaseUrl('myapp.onrender.com')).toBe('https://myapp.onrender.com/api');
+  });
 });

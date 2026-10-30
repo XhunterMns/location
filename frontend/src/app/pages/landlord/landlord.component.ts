@@ -16,8 +16,10 @@ import { AuthService } from '../../auth/auth.service';
 export class LandlordComponent {
 
   locals: any[] = [];
+  reservations: any[] = [];
   notifications: any[] = [];
   selectedLocal: any | null = null;
+  selectedReservation: any | null = null;
   editLocal: any = null;
   searchTerm = '';
   authService = inject(AuthService);
@@ -45,12 +47,19 @@ export class LandlordComponent {
   ngOnInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     this.loadLocals();
+    this.loadReservations();
     this.loadNotifications();
   }
 
   loadLocals() {
     this.service.getMyLocals().subscribe((res: any) => {
       this.locals = res;
+    });
+  }
+
+  loadReservations() {
+    this.service.getReservations().subscribe((res: any) => {
+      this.reservations = Array.isArray(res) ? res : [];
     });
   }
 
@@ -122,6 +131,14 @@ export class LandlordComponent {
   }
   closeEdit() {
     this.editLocal = null;
+  }
+
+  viewReservation(reservation: any) {
+    this.selectedReservation = reservation;
+  }
+
+  closeReservation() {
+    this.selectedReservation = null;
   }
 
 }

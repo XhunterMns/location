@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { APP_CONFIG } = require('../config/app.config');
-const { createUser, findUserByEmail, ensureAdminUser } = require('../repositories/users.repository');
+const usersRepo = require('../repositories/users.repository');
 const { normalizeRole } = require('../utils/api-response');
 
 async function registerUser({ name, email, password, role }) {
@@ -11,14 +11,18 @@ async function registerUser({ name, email, password, role }) {
     throw Object.assign(new Error('Missing fields'), { statusCode: 400 });
   }
 
-  if (!['landlord', 'renter'].includes(normalizedRole)) {
+  if (!['landlord', 'renter', 'agency_owner', 'agency_agent'].includes(normalizedRole)) {
     throw Object.assign(new Error('Invalid role'), { statusCode: 400 });
   }
 
   const hashedPassword = await bcrypt.hash(password, APP_CONFIG.bcryptRounds);
-  const user = await createUser({ name, email, password: hashedPassword, role: normalizedRole });
-
-  return { id: user.id, message: 'User created' };
+  try {
+    const user = await usersRepo.createUser({ name, email, password: hashedPassword, role: normalizedRole });
+    return { id: user.id, message: 'User created' };
+  } catch (err) {
+    // Propagate repository errors (e.g., duplicate email)
+      if (err && err.code === 'ER_DUP_ENTRY') { throw Object.assign(new Error('Email already registered'), { statusCode: 409 }); } throw err;
+  }
 }
 
 async function loginUser({ email, password }) {
@@ -26,14 +30,10 @@ async function loginUser({ email, password }) {
     throw Object.assign(new Error('Missing credentials'), { statusCode: 400 });
   }
 
-  const user = await findUserByEmail(email);
+  const user = await usersRepo.findUserByEmail(email);
 
-  if ((!user || !user.email) && email === 'admin' && password === 'admin') {
-    const hashedPassword = await bcrypt.hash('admin', APP_CONFIG.bcryptRounds);
-    const createdAdmin = await ensureAdminUser(hashedPassword);
-    const token = jwt.sign({ id: createdAdmin.id, role: 'admin' }, APP_CONFIG.jwtSecret, { expiresIn: '1h' });
-    return { token, role: 'admin' };
-  }
+  // Insecure admin auto‑creation removed – login now only authenticates existing users.
+
 
   if (!user) {
     throw Object.assign(new Error('User not found'), { statusCode: 401 });
@@ -45,14 +45,19 @@ async function loginUser({ email, password }) {
   }
 
   const normalizedRole = normalizeRole(user.role);
-  const token = jwt.sign({ id: user.id, role: normalizedRole }, APP_CONFIG.jwtSecret, { expiresIn: '1h' });
+  const token = jwt.sign({
+    id: user.id,
+    role: normalizedRole,
+    agency_id: user.agency_id || null,
+    agency_role: user.agency_role || null,
+  }, APP_CONFIG.jwtSecret, { expiresIn: '1h' });
 
-  return { token, role: normalizedRole };
+  return { token, role: normalizedRole, agency_id: user.agency_id || null, agency_role: user.agency_role || null };
 }
 
 async function setupAdminUser() {
   const hashedPassword = await bcrypt.hash('admin', APP_CONFIG.bcryptRounds);
-  const admin = await ensureAdminUser(hashedPassword);
+  const admin = await usersRepo.ensureAdminUser(hashedPassword);
 
   if (!admin?.id) {
     throw Object.assign(new Error('Could not ensure admin user'), { statusCode: 500 });

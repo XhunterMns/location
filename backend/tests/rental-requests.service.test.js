@@ -56,3 +56,36 @@ test('createRentalRequest sends a landlord notification after a successful reser
     notificationsRepository.createNotification = originalCreateNotification;
   }
 });
+
+test('getOwnerReservations returns reservation data with apartment and renter details for the landlord dashboard', async () => {
+  const originalGetReservationsByOwnerId = rentalRequestRepository.getReservationsByOwnerId;
+
+  try {
+    rentalRequestRepository.getReservationsByOwnerId = async (ownerId) => {
+      assert.equal(ownerId, 7);
+      return [{
+        id: 101,
+        status: 'reserved',
+        startDate: '2026-02-01',
+        endDate: '2026-02-05',
+        renter_id: 22,
+        renter_name: 'Sara',
+        renter_email: 'sara@example.com',
+        local_id: 12,
+        apartment_title: 'Cozy Studio',
+        apartment_address: 'Rue de la Paix',
+        city: 'Tunis',
+        country: 'Tunisia',
+        apartment_price: '450.00',
+        cover_image: 'https://example.com/img.jpg',
+      }];
+    };
+
+    const reservations = await rentalRequestsService.getOwnerReservations(7);
+    assert.equal(reservations.length, 1);
+    assert.equal(reservations[0].renter_name, 'Sara');
+    assert.equal(reservations[0].apartment_title, 'Cozy Studio');
+  } finally {
+    rentalRequestRepository.getReservationsByOwnerId = originalGetReservationsByOwnerId;
+  }
+});

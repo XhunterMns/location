@@ -11,7 +11,26 @@ export class AuthService {
   constructor() { }
 
   httpClient = inject(HttpClient);
-  baseUrl = 'http://localhost:3000';
+
+  private getApiBaseUrl(): string {
+    const runtimeOverride =
+      typeof window !== 'undefined' && (window as any).__API_BASE_URL
+        ? String((window as any).__API_BASE_URL).replace(/\/$/, '')
+        : '';
+
+    if (runtimeOverride) {
+      return runtimeOverride;
+    }
+
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    const isLocalHost = ['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname)
+      || hostname.startsWith('192.168.')
+      || hostname.endsWith('.local');
+
+    return isLocalHost ? 'http://localhost:3000/api' : `https://${hostname}/api`;
+  }
+
+  baseUrl = this.getApiBaseUrl();
 
   private hasStorage() {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
