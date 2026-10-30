@@ -26,6 +26,12 @@ app.use('/api', adminRoutes);
 
 const PORT = process.env.PORT || 3000;
 
+console.log('[APP] Starting backend...', {
+  nodeEnv: process.env.NODE_ENV,
+  port: PORT,
+  jwtSecretConfigured: !!APP_CONFIG.jwtSecret,
+});
+
 if (APP_CONFIG.jwtSecret === 'secret123' && process.env.NODE_ENV !== 'development') {
   console.error('Invalid JWT secret configuration. Set JWT_SECRET env variable.');
   process.exit(1);
@@ -34,12 +40,13 @@ if (APP_CONFIG.jwtSecret === 'secret123' && process.env.NODE_ENV !== 'developmen
 ensureDatabaseSchema()
   .then(() => {
     const port = Number(process.env.PORT || PORT || 3000);
+    console.log('[APP] Database schema ready, starting HTTP server...');
 
     app.listen(port, '0.0.0.0', () => {
       console.log(`Server running on port ${port}`);
     });
   })
   .catch((error) => {
-    console.error('Startup failed:', error);
+    console.error('[APP] Startup failed during DB bootstrap:', error);
     process.exit(1);
   });

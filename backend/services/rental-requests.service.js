@@ -18,9 +18,9 @@ async function createRentalRequest({ userId, payload }) {
     throw Object.assign(new Error('Local not available'), { statusCode: 404 });
   }
 
-  if (local.availability !== 1) {
-    throw Object.assign(new Error('Local not available'), { statusCode: 404 });
-  }
+if (local.status !== 'published') {
+  throw Object.assign(new Error('Local not available'), { statusCode: 404 });
+}
 
   const overlap = await rentalRequestsRepository.findReservationOverlap(local_id, start_date, end_date);
   if (overlap) {

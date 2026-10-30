@@ -177,7 +177,7 @@ async function getAvailableLocalsForRenter(userId) {
         ) AS total_reviews
       FROM locals l
       LEFT JOIN users u ON u.id = l.user_id
-      WHERE l.availability = 1 AND l.user_id != ?
+      WHERE l.status = 'published'
       ORDER BY l.id DESC
     `,
     [userId]

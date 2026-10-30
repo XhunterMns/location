@@ -45,26 +45,42 @@ export class SignupComponent implements OnInit {
     }
   }
 
-  public onSubmit() {
-    this.submitted = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+public onSubmit() {
+  console.log('[SIGNUP] onSubmit triggered');
+  console.log('[SIGNUP] Form value:', this.signupForm.value);
+  console.log('[SIGNUP] Form valid:', this.signupForm.valid);
+  console.log('[SIGNUP] Form errors:', {
+    name: this.signupForm.controls.name.errors,
+    email: this.signupForm.controls.email.errors,
+    password: this.signupForm.controls.password.errors,
+    role: this.signupForm.controls.role.errors
+  });
 
-    if (!this.signupForm.valid) {
-      return;
-    }
+  this.submitted = true;
+  this.errorMessage = '';
+  this.successMessage = '';
 
-    this.submitting = true;
-    this.authService.signup(this.signupForm.value).subscribe({
-      next: () => {
-        this.submitting = false;
-        this.successMessage = 'Account created. Redirecting to sign in…';
-        setTimeout(() => this.router.navigate(['/login']), 700);
-      },
-      error: (err) => {
-        this.submitting = false;
-        this.errorMessage = err?.error?.message || 'Unable to create account. Please try again.';
-      }
-    });
+  if (this.signupForm.invalid) {
+    console.warn('[SIGNUP] Form is invalid');
+    this.signupForm.markAllAsTouched();
+    return;
   }
+
+  console.log('[SIGNUP] Sending HTTP request...');
+  this.submitting = true;
+
+  this.authService.signup(this.signupForm.value).subscribe({
+    next: (res) => {
+      console.log('[SIGNUP] API success:', res);
+      this.submitting = false;
+      this.successMessage = 'Account created. Redirecting to sign in…';
+      setTimeout(() => this.router.navigate(['/login']), 700);
+    },
+    error: (err) => {
+      console.error('[SIGNUP] API error:', err);
+      this.submitting = false;
+      this.errorMessage = err?.error?.message || err?.message || 'Unable to create account.';
+    }
+  });
+}
 }
