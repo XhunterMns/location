@@ -26,6 +26,26 @@ export class AdminService {
     return this.http.get<any[]>(`${this.baseUrl}/locals`);
   }
 
+  getAgencies(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/agencies`);
+  }
+
+  reviewAgency(id: number, status: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/agencies/${id}/status`, { status });
+  }
+
+  getPlans(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/plans`);
+  }
+
+  createPlan(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/plans`, data);
+  }
+
+  activateSubscription(id: number, data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/agencies/${id}/activate-subscription`, data);
+  }
+
   updateLocalStatus(id: number, status: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/locals/${id}/status`, { status });
   }

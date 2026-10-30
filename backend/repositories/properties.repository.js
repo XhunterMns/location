@@ -1,8 +1,8 @@
 const { pool } = require('../db_config/database');
 
-async function createLocal({ title, address, city, delegation, country, phone_number, description, price, availability, is_colocation = 0, room_type, available_places, gender_preference, colocation_rules, userId, status = 'published' }) {
+async function createLocal({ title, address, city, delegation, country, phone_number, description, price, availability, is_colocation = 0, room_type, available_places, gender_preference, colocation_rules, userId, agencyId = null, status = 'published' }) {
   const [result] = await pool.query(
-    'INSERT INTO locals (title, address, city, delegation, country, phone_number, description, price, availability, is_colocation, room_type, available_places, gender_preference, colocation_rules, user_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO locals (title, address, city, delegation, country, phone_number, description, price, availability, is_colocation, room_type, available_places, gender_preference, colocation_rules, user_id, agency_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     [
       title,
       address,
@@ -12,13 +12,14 @@ async function createLocal({ title, address, city, delegation, country, phone_nu
       phone_number || null,
       description,
       price,
-      availability ? 1 : 1,
+      availability ? 1 : 0,
       is_colocation ? 1 : 0,
       room_type || null,
       available_places ?? null,
       gender_preference || null,
       colocation_rules || null,
       userId,
+      agencyId ?? null,
       status,
     ]
   );
@@ -26,7 +27,15 @@ async function createLocal({ title, address, city, delegation, country, phone_nu
   return { id: result.insertId };
 }
 
-async function getLocalsByUserId(userId) {
+async function getLocalsByUserId(userId, agencyId = null, role = null) {
+  const baseWhere = role === 'agency_owner' || role === 'agency_agent'
+    ? '(l.user_id = ? OR l.agency_id = ?)' 
+    : 'l.user_id = ?';
+
+  const params = role === 'agency_owner' || role === 'agency_agent'
+    ? [userId, agencyId || 0, userId]
+    : [userId];
+
   const [rows] = await pool.query(
     `
       SELECT 
@@ -50,10 +59,10 @@ async function getLocalsByUserId(userId) {
           WHERE e.local_id = l.id
         ) AS total_reviews
       FROM locals l
-      WHERE l.user_id = ?
+      WHERE ${baseWhere}
       ORDER BY l.id DESC
     `,
-    [userId]
+    params
   );
 
   return rows;
@@ -64,12 +73,18 @@ async function getLocalById(id) {
   return rows[0] || null;
 }
 
-async function getOwnedLocalById(id, userId) {
+async function getOwnedLocalById(id, userId, user = null) {
+  const isAgencyRole = user && ['agency_owner', 'agency_agent'].includes(String(user.role || '').toLowerCase());
+  if (isAgencyRole && user.agency_id) {
+    const [rows] = await pool.query('SELECT * FROM locals WHERE id = ? AND (user_id = ? OR agency_id = ?) LIMIT 1', [id, userId, user.agency_id]);
+    return rows[0] || null;
+  }
+
   const [rows] = await pool.query('SELECT * FROM locals WHERE id = ? AND user_id = ? LIMIT 1', [id, userId]);
   return rows[0] || null;
 }
 
-async function updateLocalByOwner(id, userId, payload) {
+async function updateLocalByOwner(id, userId, payload, user = null) {
   const {
     title,
     address,
@@ -84,30 +99,56 @@ async function updateLocalByOwner(id, userId, payload) {
     colocation_rules,
   } = payload;
 
+  const agencyRole = user && ['agency_owner', 'agency_agent'].includes(String(user.role || '').toLowerCase());
   const [result] = await pool.query(
-    'UPDATE locals SET title = ?, address = ?, country = ?, description = ?, price = ?, availability = ?, is_colocation = ?, room_type = ?, available_places = ?, gender_preference = ?, colocation_rules = ? WHERE id = ? AND user_id = ?',
-    [
-      title,
-      address,
-      country || 'Tunisia',
-      description,
-      price,
-      availability ? 1 : 0,
-      is_colocation ? 1 : 0,
-      room_type || null,
-      available_places ?? null,
-      gender_preference || null,
-      colocation_rules || null,
-      id,
-      userId,
-    ]
+    agencyRole && user.agency_id
+      ? 'UPDATE locals SET title = ?, address = ?, country = ?, description = ?, price = ?, availability = ?, is_colocation = ?, room_type = ?, available_places = ?, gender_preference = ?, colocation_rules = ? WHERE id = ? AND (user_id = ? OR agency_id = ?)'
+      : 'UPDATE locals SET title = ?, address = ?, country = ?, description = ?, price = ?, availability = ?, is_colocation = ?, room_type = ?, available_places = ?, gender_preference = ?, colocation_rules = ? WHERE id = ? AND user_id = ?',
+    agencyRole && user.agency_id
+      ? [
+          title,
+          address,
+          country || 'Tunisia',
+          description,
+          price,
+          availability ? 1 : 0,
+          is_colocation ? 1 : 0,
+          room_type || null,
+          available_places ?? null,
+          gender_preference || null,
+          colocation_rules || null,
+          id,
+          userId,
+          user.agency_id,
+        ]
+      : [
+          title,
+          address,
+          country || 'Tunisia',
+          description,
+          price,
+          availability ? 1 : 0,
+          is_colocation ? 1 : 0,
+          room_type || null,
+          available_places ?? null,
+          gender_preference || null,
+          colocation_rules || null,
+          id,
+          userId,
+        ]
   );
 
   return { affectedRows: result.affectedRows };
 }
 
-async function deleteLocalByOwner(id, userId) {
-  const [result] = await pool.query('DELETE FROM locals WHERE id = ? AND user_id = ?', [id, userId]);
+async function deleteLocalByOwner(id, userId, user = null) {
+  const agencyRole = user && ['agency_owner', 'agency_agent'].includes(String(user.role || '').toLowerCase());
+  const [result] = await pool.query(
+    agencyRole && user.agency_id
+      ? 'DELETE FROM locals WHERE id = ? AND (user_id = ? OR agency_id = ?)'
+      : 'DELETE FROM locals WHERE id = ? AND user_id = ?',
+    agencyRole && user.agency_id ? [id, userId, user.agency_id] : [id, userId]
+  );
   return { affectedRows: result.affectedRows };
 }
 
@@ -194,6 +235,15 @@ async function deleteLocalReservations(localId) {
   await pool.query('DELETE FROM reservations WHERE local_id = ?', [localId]);
 }
 
+async function getActiveListingCountForAgency(agencyId) {
+  const [rows] = await pool.query(
+    'SELECT COUNT(*) AS total FROM locals WHERE agency_id = ? AND status = "published"',
+    [agencyId]
+  );
+
+  return Number(rows?.[0]?.total || 0);
+}
+
 async function getAdminLocals() {
   const [rows] = await pool.query(
     `
@@ -265,6 +315,7 @@ module.exports = {
   deleteLocalImages,
   deleteLocalEvaluations,
   deleteLocalReservations,
+  getActiveListingCountForAgency,
   getAdminLocals,
   updateLocalStatusByAdmin,
   updateLocalByAdmin,

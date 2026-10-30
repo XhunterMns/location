@@ -8,6 +8,8 @@ function redirectToRoleHome(router: Router, role: string | null): false {
     admin: '/admin',
     landlord: '/landlord',
     renter: '/renter',
+    agency_owner: '/agency/dashboard',
+    agency_agent: '/agency/dashboard',
   }[role || ''] || '/login';
 
   router.navigate([targetRoute]);
@@ -28,7 +30,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   const role = authService.getRole();
-  if (role === 'landlord' || role === 'renter' || role === 'admin') {
+  if (role === 'landlord' || role === 'renter' || role === 'admin' || role === 'agency_owner' || role === 'agency_agent') {
     return true;
   }
 
@@ -49,7 +51,7 @@ export const landlordGuard: CanActivateFn = (route, state) => {
   }
 
   const role = authService.getRole();
-  if (role === 'landlord') {
+  if (role === 'landlord' || role === 'agency_owner' || role === 'agency_agent') {
     return true;
   }
 

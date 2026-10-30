@@ -10,13 +10,19 @@ async function findUserById(id) {
   return rows[0] || null;
 }
 
-async function createUser({ name, email, password, role }) {
-  const [result] = await pool.query(
-    'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-    [name || null, email, password, role]
-  );
-
-  return { id: result.insertId };
+async function createUser({ name, email, password, role, agency_id, agency_role }) {
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO users (name, email, password, role, agency_id, agency_role) VALUES (?, ?, ?, ?, ?, ?)',
+      [name || null, email, password, role, agency_id ?? null, agency_role ?? null]
+    );
+    return { id: result.insertId };
+  } catch (error) {
+    if (error && error.code === 'ER_DUP_ENTRY') {
+      throw Object.assign(new Error('Email already registered'), { statusCode: 409 });
+    }
+    throw error;
+  }
 }
 
 async function getAllUsers() {
@@ -41,6 +47,16 @@ async function updateUserById(id, payload) {
   if (payload?.role !== undefined) {
     fields.push('role = ?');
     values.push(payload.role ?? null);
+  }
+
+  if (payload?.agency_id !== undefined) {
+    fields.push('agency_id = ?');
+    values.push(payload.agency_id ?? null);
+  }
+
+  if (payload?.agency_role !== undefined) {
+    fields.push('agency_role = ?');
+    values.push(payload.agency_role ?? null);
   }
 
   if (payload?.password !== undefined) {

@@ -1,0 +1,58 @@
+<div class="agency-page">
+  <div class="agency-panel panel-surface">
+    <div class="header-row">
+      <div>
+        <p class="section-kicker">Agency onboarding</p>
+        <h1 class="font-display">Register your real estate agency</h1>
+        <p class="lead-copy">Submit your business details for verification and dashboard access.</p>
+      </div>
+      <a routerLink="/agency/dashboard" class="secondary-btn">Back to dashboard</a>
+    </div>
+
+    <div *ngIf="message" class="success-box">{{ message }}</div>
+    <div *ngIf="errorMessage" class="error-box">{{ errorMessage }}</div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()" class="agency-form" novalidate>
+      <label>
+        <span>Agency name</span>
+        <input type="text" formControlName="name" placeholder="Agency name" />
+      </label>
+
+      <label>
+        <span>Business email</span>
+        <input type="email" formControlName="business_email" placeholder="business@agency.com" />
+      </label>
+
+      <label>
+        <span>Phone</span>
+        <input type="tel" formControlName="phone" placeholder="+216 …" />
+      </label>
+
+      <label>
+        <span>Address</span>
+        <input type="text" formControlName="address" placeholder="Street address" />
+      </label>
+
+      <label>
+        <span>City</span>
+        <input type="text" formControlName="city" placeholder="City" />
+      </label>
+
+      <label class="full-width">
+        <span>Description</span>
+        <textarea formControlName="description" rows="4" placeholder="Tell renters what your agency specializes in"></textarea>
+      </label>
+
+      <label class="full-width">
+        <span>Logo URL</span>
+        <input type="text" formControlName="logo_url" placeholder="https://…" />
+      </label>
+
+      <div class="form-actions full-width">
+        <button type="submit" class="primary-btn" [disabled]="loading">
+          {{ loading ? 'Submitting…' : 'Submit agency registration' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

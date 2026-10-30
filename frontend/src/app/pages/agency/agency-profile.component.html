@@ -1,0 +1,57 @@
+<div class="public-agency-page">
+  <div *ngIf="loading" class="loading-state">Loading agency profile…</div>
+
+  <div *ngIf="!loading && agency" class="agency-profile-shell">
+    <header class="profile-header">
+      <img *ngIf="agency.logo_url" [src]="agency.logo_url" alt="" class="logo" />
+      <div>
+        <p class="eyebrow on-dark">Agency profile</p>
+        <h1 class="font-display">{{ agency.name }}</h1>
+        <p>{{ agency.city }}</p>
+      </div>
+    </header>
+
+    <section class="profile-content">
+      <div class="profile-card panel-surface">
+        <p class="section-kicker">About</p>
+        <h2>Agency overview</h2>
+        <p class="lead-copy">{{ agency.description || 'This agency has not added a description yet.' }}</p>
+      </div>
+
+      <div class="profile-card panel-surface">
+        <p class="section-kicker">Contact</p>
+        <h2>Get in touch</h2>
+        <dl class="detail-list">
+          <div><dt>Email</dt><dd>{{ agency.business_email }}</dd></div>
+          <div><dt>Phone</dt><dd>{{ agency.phone }}</dd></div>
+          <div><dt>Address</dt><dd>{{ agency.address }}</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="listing-card panel-surface" *ngIf="agency.properties?.length; else noProperties">
+      <div class="section-title-row">
+        <div>
+          <p class="section-kicker">Portfolio</p>
+          <h2>Published properties</h2>
+        </div>
+        <span class="pill-count">{{ agency.properties.length }} listings</span>
+      </div>
+
+      <div class="property-grid">
+        <article *ngFor="let local of agency.properties" class="property-item">
+          <h3>{{ local.title }}</h3>
+          <p>{{ local.city }} · {{ local.country || 'Tunisia' }}</p>
+          <strong class="price-tag">{{ local.price }} TND</strong>
+        </article>
+      </div>
+    </section>
+
+    <ng-template #noProperties>
+      <div class="profile-card panel-surface empty-state">
+        <h3>No published properties</h3>
+        <p>This agency has not published listings yet.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

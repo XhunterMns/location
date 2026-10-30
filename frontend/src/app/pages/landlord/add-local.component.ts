@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { LandlordService } from '../../users/landlord.service';
 import { firstValueFrom } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-add-local',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IonContent],
   templateUrl: './add-local.component.html',
   styleUrls: ['./add-local.component.css']
 })

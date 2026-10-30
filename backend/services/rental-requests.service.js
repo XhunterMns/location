@@ -6,6 +6,10 @@ async function getMyReservations(userId) {
   return rentalRequestsRepository.getReservationsByUserId(userId);
 }
 
+async function getOwnerReservations(ownerId) {
+  return rentalRequestsRepository.getReservationsByOwnerId(ownerId);
+}
+
 async function createRentalRequest({ userId, payload }) {
   const { local_id, start_date, end_date } = payload;
 
@@ -80,6 +84,7 @@ async function addEvaluation({ userId, payload }) {
 
 module.exports = {
   getMyReservations,
+  getOwnerReservations,
   createRentalRequest,
   deleteRentalRequest,
   addEvaluation,

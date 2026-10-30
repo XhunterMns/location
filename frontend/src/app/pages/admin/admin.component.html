@@ -1,169 +1,256 @@
-<div class="admin-container">
-  <nav class="admin-nav">
-    <div class="nav-brand">Admin Dashboard</div>
-    <div class="nav-links">
-      <button [class.active]="activeTab === 'locals'" (click)="setTab('locals')">Manage Locals</button>
-      <button [class.active]="activeTab === 'users'" (click)="setTab('users')">Manage Users</button>
-      <button class="refresh-btn" (click)="loadData()" [disabled]="loading">
-        <span *ngIf="!loading">🔄 Refresh</span>
-        <span *ngIf="loading">⌛ Loading...</span>
-      </button>
-      <button class="logout-btn" (click)="logout()">Logout</button>
-    </div>
-  </nav>
+<ion-content class="ion-padding">
+  <div class="admin-container">
+    <nav class="admin-nav" aria-label="Admin sections">
+      <div class="nav-brand">
+        <p class="section-kicker">Administration</p>
+        <h1 class="font-display">Platform control</h1>
+      </div>
+      <div class="nav-links">
+        <button type="button" [class.active]="activeTab === 'locals'" (click)="setTab('locals')">Locals</button>
+        <button type="button" [class.active]="activeTab === 'users'" (click)="setTab('users')">Users</button>
+        <button type="button" [class.active]="activeTab === 'agencies'" (click)="setTab('agencies')">Agencies</button>
+        <button type="button" [class.active]="activeTab === 'plans'" (click)="setTab('plans')">Plans</button>
+        <button class="refresh-btn" type="button" (click)="loadData()" [disabled]="loading">
+          {{ loading ? 'Loading…' : 'Refresh' }}
+        </button>
+      </div>
+    </nav>
 
-  <main class="admin-content">
-    <div *ngIf="loading" class="loading-state">
-      <p>Loading data...</p>
-    </div>
+    <main class="admin-content">
+      <div *ngIf="loading" class="loading-state">
+        <p>Loading platform data…</p>
+      </div>
 
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-      <button (click)="loadData()">Retry</button>
-    </div>
+      <div *ngIf="errorMessage" class="error-message">
+        <span>{{ errorMessage }}</span>
+        <button type="button" (click)="loadData()">Retry</button>
+      </div>
 
-    <div class="search-box admin-search" *ngIf="!loading">
-      <span class="search-icon">⌕</span>
-      <input
-        type="text"
-        placeholder="Search users or locals"
-        [value]="searchTerm"
-        (input)="searchTerm = $any($event.target).value"
-      />
-    </div>
+      <div class="search-box admin-search" *ngIf="!loading">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5"/><path d="M20 20l-3.2-3.2"/>
+        </svg>
+        <input
+          type="search"
+          placeholder="Search users or locals"
+          [value]="searchTerm"
+          (input)="searchTerm = $any($event.target).value"
+          aria-label="Search users or locals"
+        />
+      </div>
 
-    <!-- Manage Locals Tab -->
-    <section *ngIf="!loading && activeTab === 'locals'">
-      <h2>Locals Management</h2>
-      <div class="local-card-grid" *ngIf="filteredLocals.length > 0; else noLocals">
-        <article class="local-admin-card" *ngFor="let local of filteredLocals">
-          <img *ngIf="local.cover_image; else noLocalImage" [src]="local.cover_image" [alt]="local.title" class="local-card-image" />
-          <ng-template #noLocalImage>
-            <div class="local-card-image placeholder">No image</div>
-          </ng-template>
-
-          <div class="local-card-body">
-            <div class="local-card-head">
-              <div>
-                <p class="local-id">#{{ local.id }}</p>
-                <h3>{{ local.title }}</h3>
-              </div>
-              <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : 'active'">
-                {{ local.is_reserved ? 'reserved' : 'active' }}
-              </span>
-            </div>
-
-            <p class="local-meta"><strong>Address:</strong> {{ local.address }}</p>
-            <p class="local-meta"><strong>Price:</strong> {{ local.price }} DH</p>
-            <p class="local-meta"><strong>Landlord:</strong> {{ local.landlord_email || 'Unknown' }}</p>
-
-            <div class="action-buttons">
-              <button class="btn-edit" (click)="editLocal(local)" title="Edit">✏️ Edit</button>
-              <button class="btn-delete" (click)="deleteLocal(local.id)" title="Delete">🗑️ Delete</button>
-            </div>
+      <section *ngIf="!loading && activeTab === 'locals'">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Inventory</p>
+            <h2>Locals management</h2>
           </div>
-        </article>
-      </div>
-      <ng-template #noLocals>
-        <div class="empty-state">
-          <p>No locals found for evaluation.</p>
+          <span class="pill-count">{{ filteredLocals.length }} shown</span>
         </div>
-      </ng-template>
-    </section>
 
-    <!-- Manage Users Tab -->
-    <section *ngIf="!loading && activeTab === 'users'">
-      <h2>User Management</h2>
-      <div class="table-responsive" *ngIf="filteredUsers.length > 0; else noUsers">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let user of filteredUsers">
-              <td>{{ user.id }}</td>
-              <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn-edit" (click)="editUser(user)">Edit</button>
-                  <button class="btn-delete" (click)="deleteUser(user.id)">Delete</button>
+        <div class="local-card-grid" *ngIf="filteredLocals.length > 0; else noLocals">
+          <article class="local-admin-card" *ngFor="let local of filteredLocals">
+            <img *ngIf="local.cover_image; else noLocalImage" [src]="local.cover_image" [alt]="local.title" class="local-card-image" />
+            <ng-template #noLocalImage>
+              <div class="local-card-image placeholder">No image</div>
+            </ng-template>
+
+            <div class="local-card-body">
+              <div class="local-card-head">
+                <div>
+                  <p class="local-id">#{{ local.id }}</p>
+                  <h3>{{ local.title }}</h3>
                 </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <span class="status-badge" [ngClass]="local.is_reserved ? 'reserved' : 'active'">
+                  {{ local.is_reserved ? 'reserved' : 'active' }}
+                </span>
+              </div>
+
+              <p class="local-meta"><strong>Address:</strong> {{ local.address }}</p>
+              <p class="local-meta"><strong>Price:</strong> {{ local.price }} TND</p>
+              <p class="local-meta"><strong>Landlord:</strong> {{ local.landlord_email || 'Unknown' }}</p>
+
+              <div class="action-buttons">
+                <button class="btn-edit" type="button" (click)="editLocal(local)">Edit</button>
+                <button class="btn-delete" type="button" (click)="deleteLocal(local.id)">Delete</button>
+              </div>
+            </div>
+          </article>
+        </div>
+        <ng-template #noLocals>
+          <div class="empty-state">
+            <h3>No locals found</h3>
+            <p>Try a different search term or refresh the list.</p>
+          </div>
+        </ng-template>
+      </section>
+
+      <section *ngIf="!loading && activeTab === 'users'">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Accounts</p>
+            <h2>User management</h2>
+          </div>
+          <span class="pill-count">{{ filteredUsers.length }} shown</span>
+        </div>
+
+        <div class="table-responsive" *ngIf="filteredUsers.length > 0; else noUsers">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of filteredUsers">
+                <td>{{ user.id }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td><span class="type-tag neutral">{{ user.role }}</span></td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn-edit" type="button" (click)="editUser(user)">Edit</button>
+                    <button class="btn-delete" type="button" (click)="deleteUser(user.id)">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noUsers>
+          <div class="empty-state">
+            <h3>No users found</h3>
+            <p>No accounts match the current search.</p>
+          </div>
+        </ng-template>
+      </section>
+
+      <section *ngIf="!loading && activeTab === 'agencies'">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Partners</p>
+            <h2>Agency review</h2>
+          </div>
+        </div>
+
+        <div class="local-card-grid" *ngIf="agencies.length > 0; else noAgencies">
+          <article class="local-admin-card" *ngFor="let agency of agencies">
+            <div class="local-card-body">
+              <div class="local-card-head">
+                <div>
+                  <p class="local-id">#{{ agency.id }}</p>
+                  <h3>{{ agency.name }}</h3>
+                </div>
+                <span class="status-badge" [ngClass]="agency.status === 'approved' ? 'active' : 'reserved'">
+                  {{ agency.status }}
+                </span>
+              </div>
+
+              <p class="local-meta"><strong>Email:</strong> {{ agency.business_email }}</p>
+              <p class="local-meta"><strong>Owner:</strong> {{ agency.owner_name || agency.owner_email || 'Unknown owner' }}</p>
+              <p class="local-meta"><strong>City:</strong> {{ agency.city }}</p>
+              <p class="local-meta"><strong>Plan:</strong> {{ agency.subscription_plan || 'free' }}</p>
+
+              <div class="action-buttons">
+                <button class="btn-approve" type="button" (click)="approveAgency(agency.id)">Approve</button>
+                <button class="btn-reject" type="button" (click)="rejectAgency(agency.id)">Reject</button>
+              </div>
+            </div>
+          </article>
+        </div>
+        <ng-template #noAgencies>
+          <div class="empty-state"><h3>No agencies pending review</h3><p>New agency registrations will appear here.</p></div>
+        </ng-template>
+      </section>
+
+      <section *ngIf="!loading && activeTab === 'plans'">
+        <div class="section-title-row">
+          <div>
+            <p class="section-kicker">Billing</p>
+            <h2>Agency subscription plans</h2>
+          </div>
+        </div>
+
+        <div class="local-card-grid" *ngIf="plans.length > 0; else noPlans">
+          <article class="local-admin-card" *ngFor="let plan of plans">
+            <div class="local-card-body">
+              <div class="local-card-head">
+                <div>
+                  <p class="local-id">{{ plan.key_name }}</p>
+                  <h3>{{ plan.name }}</h3>
+                </div>
+                <span class="status-badge active">{{ plan.status }}</span>
+              </div>
+
+              <p class="local-meta"><strong>Listings:</strong> {{ plan.max_listings }}</p>
+              <p class="local-meta"><strong>Team members:</strong> {{ plan.max_team_members }}</p>
+              <p class="local-meta"><strong>Price:</strong> ${{ plan.price }}</p>
+
+              <div class="action-buttons">
+                <button class="btn-edit" type="button" (click)="activateSubscription(1, plan.key_name)">Activate</button>
+              </div>
+            </div>
+          </article>
+        </div>
+        <ng-template #noPlans>
+          <div class="empty-state"><h3>No plans configured</h3><p>Subscription plans will show here once available.</p></div>
+        </ng-template>
+      </section>
+    </main>
+
+    <div class="modal" *ngIf="editingLocal" role="dialog" aria-modal="true" aria-labelledby="edit-local-title">
+      <div class="modal-content">
+        <h3 id="edit-local-title">Edit local</h3>
+        <form (ngSubmit)="saveLocal()">
+          <div class="form-group">
+            <label>Title <input type="text" [(ngModel)]="editingLocal.title" name="title"></label>
+          </div>
+          <div class="form-group">
+            <label>Address <input type="text" [(ngModel)]="editingLocal.address" name="address"></label>
+          </div>
+          <div class="form-group">
+            <label>Price <input type="number" [(ngModel)]="editingLocal.price" name="price"></label>
+          </div>
+          <div class="form-group">
+            <label>Description <textarea [(ngModel)]="editingLocal.description" name="description" rows="4"></textarea></label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="editingLocal = null">Cancel</button>
+            <button type="submit" class="btn-save">Save changes</button>
+          </div>
+        </form>
       </div>
-      <ng-template #noUsers>
-        <div class="empty-state">
-          <p>No users found in the system.</p>
-        </div>
-      </ng-template>
-    </section>
-  </main>
+    </div>
 
-  <!-- Edit Local Modal -->
-  <div class="modal" *ngIf="editingLocal">
-    <div class="modal-content">
-      <h3>Edit Local</h3>
-      <form (ngSubmit)="saveLocal()">
-        <div class="form-group">
-          <label>Title</label>
-          <input type="text" [(ngModel)]="editingLocal.title" name="title">
-        </div>
-        <div class="form-group">
-          <label>Address</label>
-          <input type="text" [(ngModel)]="editingLocal.address" name="address">
-        </div>
-        <div class="form-group">
-          <label>Price</label>
-          <input type="number" [(ngModel)]="editingLocal.price" name="price">
-        </div>
-        <div class="form-group">
-          <label>Description</label>
-          <textarea [(ngModel)]="editingLocal.description" name="description" rows="4"></textarea>
-        </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn-save">Save Changes</button>
-          <button type="button" class="btn-cancel" (click)="editingLocal = null">Cancel</button>
-        </div>
-      </form>
+    <div class="modal" *ngIf="editingUser" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
+      <div class="modal-content">
+        <h3 id="edit-user-title">Edit user</h3>
+        <form (ngSubmit)="saveUser()">
+          <div class="form-group">
+            <label>Name <input type="text" [(ngModel)]="editingUser.name" name="name"></label>
+          </div>
+          <div class="form-group">
+            <label>Email <input type="email" [(ngModel)]="editingUser.email" name="email"></label>
+          </div>
+          <div class="form-group">
+            <label>Role
+              <select [(ngModel)]="editingUser.role" name="role">
+                <option value="landlord">Landlord</option>
+                <option value="renter">Renter</option>
+                <option value="admin">Admin</option>
+              </select>
+            </label>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="editingUser = null">Cancel</button>
+            <button type="submit" class="btn-save">Save changes</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-
-  <!-- Edit User Modal -->
-  <div class="modal" *ngIf="editingUser">
-    <div class="modal-content">
-      <h3>Edit User</h3>
-      <form (ngSubmit)="saveUser()">
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" [(ngModel)]="editingUser.name" name="name">
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" [(ngModel)]="editingUser.email" name="email">
-        </div>
-        <div class="form-group">
-          <label>Role</label>
-          <select [(ngModel)]="editingUser.role" name="role">
-            <option value="landlord">Landlord</option>
-            <option value="renter">Renter</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div class="modal-actions">
-          <button type="submit" class="btn-save">Save Changes</button>
-          <button type="button" class="btn-cancel" (click)="editingUser = null">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+</ion-content>

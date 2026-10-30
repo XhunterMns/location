@@ -23,11 +23,13 @@ async function getProfileById(userId) {
     name: user.name,
     email: user.email,
     role: user.role,
+    agency_id: user.agency_id ?? null,
+    agency_role: user.agency_role ?? null,
   };
 }
 
 async function updateUser({ userId, payload }) {
-  const { name, email, role, password, old_password } = payload || {};
+  const { name, email, role, agency_id, agency_role, password, old_password } = payload || {};
 
   if (password) {
     const currentUser = await findUserById(userId);
@@ -45,6 +47,8 @@ async function updateUser({ userId, payload }) {
     ...(name !== undefined ? { name } : {}),
     ...(email !== undefined ? { email } : {}),
     ...(role !== undefined ? { role } : {}),
+    ...(agency_id !== undefined ? { agency_id } : {}),
+    ...(agency_role !== undefined ? { agency_role } : {}),
     ...(password ? { password: await bcrypt.hash(password, APP_CONFIG.bcryptRounds) } : {}),
   };
 

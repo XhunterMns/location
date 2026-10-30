@@ -1,0 +1,8 @@
+{
+  "name": "rentili",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "project": "front-ionic"
+}

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">front-ionic</string>
+    <string name="title_activity_main">front-ionic</string>
+    <string name="package_name">com.frontionic.app</string>
+    <string name="custom_url_scheme">com.frontionic.app</string>
+</resources>

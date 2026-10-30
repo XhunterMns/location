@@ -56,6 +56,10 @@ export class LandlordService {
     return this.http.get(`${this.baseUrl}/locals/${localId}/images`, this.authHeaders());
   }
 
+  getReservations() {
+    return this.http.get(`${this.baseUrl}/reservations`, this.authHeaders());
+  }
+
   getNotifications() {
     return this.http.get(`${this.baseUrl}/notifications`, this.authHeaders());
   }
