@@ -6,8 +6,62 @@
       <p class="lead-copy">Manage your properties, review status updates, and keep every rental listing current.</p>
     </div>
 
-    <button class="add-btn" routerLink="/landlord/add">+ Add listing</button>
+    <button class="add-btn" routerLink="/landlord/add">Add listing</button>
   </header>
+
+  <section class="reservation-panel panel-surface">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Bookings</p>
+        <h2>Reservations</h2>
+      </div>
+      <div class="notifications-actions">
+        <span class="pill-count" *ngIf="reservations.length">{{ reservations.length }} total</span>
+        <button type="button" class="refresh-btn" (click)="loadReservations()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="reservation-grid" *ngIf="reservations.length; else noReservations">
+      <article class="reservation-card" *ngFor="let reservation of reservations">
+        <img *ngIf="reservation.cover_image" [src]="reservation.cover_image" [alt]="reservation.apartment_title || reservation.title" class="reservation-cover" />
+
+        <div class="reservation-body">
+          <div class="reservation-topline">
+            <span class="status-pill" [ngClass]="reservation.status || 'reserved'">{{ reservation.status || 'reserved' }}</span>
+            <span class="reservation-date">{{ reservation.start_date | date:'mediumDate' }} → {{ reservation.end_date | date:'mediumDate' }}</span>
+          </div>
+
+          <h3>{{ reservation.apartment_title || reservation.title }}</h3>
+          <p class="reservation-address">{{ reservation.apartment_address || reservation.address }}</p>
+
+          <div class="reservation-info-row">
+            <div>
+              <span class="meta-label">Renter</span>
+              <strong>{{ reservation.renter_name || 'Unknown user' }}</strong>
+              <small>{{ reservation.renter_email || 'No email provided' }}</small>
+            </div>
+
+            <div>
+              <span class="meta-label">Location</span>
+              <strong>{{ reservation.city || 'Unknown city' }}, {{ reservation.country || 'Tunisia' }}</strong>
+              <small>{{ reservation.apartment_price || reservation.price || 0 }} TND</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="reservation-actions">
+          <button type="button" class="view-btn" (click)="viewReservation(reservation)">View</button>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #noReservations>
+      <div class="empty-notifications">
+        <h3>No reservations yet</h3>
+        <p>When a renter books one of your apartments, the reservation details will show up here.</p>
+      </div>
+    </ng-template>
+  </section>
 
   <section class="notifications-panel panel-surface">
     <div class="section-title-row">
@@ -50,12 +104,15 @@
     </div>
 
     <div class="search-box">
-      <span class="search-icon">⌕</span>
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5"/><path d="M20 20l-3.2-3.2"/>
+      </svg>
       <input
-        type="text"
+        type="search"
         placeholder="Search listings by title, address, status..."
         [value]="searchTerm"
         (input)="searchTerm = $any($event.target).value"
+        aria-label="Search listings"
       />
     </div>
 
@@ -76,7 +133,7 @@
             </span>
           </p>
           <p class="evaluation-row">
-            ⭐ {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }}
+            {{ l.evaluation ? (l.evaluation | number:'1.1-1') : '0.0' }} rating
             <span>({{ l.total_reviews }} reviews)</span>
           </p>
         </div>
@@ -164,6 +221,51 @@
 
         <button type="submit" class="primary-btn">Save changes</button>
       </form>
+    </div>
+  </div>
+
+  <div class="view-modal-wrap" *ngIf="selectedReservation">
+    <div class="modal-backdrop" (click)="closeReservation()"></div>
+
+    <div class="view-modal panel-surface reservation-detail-modal">
+      <button class="close-btn" type="button" (click)="closeReservation()">×</button>
+
+      <div class="modal-header">
+        <div>
+          <p class="section-kicker">Reservation details</p>
+          <h3>{{ selectedReservation.apartment_title || selectedReservation.title }}</h3>
+        </div>
+        <span class="status-pill" [ngClass]="selectedReservation.status || 'reserved'">{{ selectedReservation.status || 'reserved' }}</span>
+      </div>
+
+      <div class="reservation-detail-grid">
+        <div class="info-card">
+          <h4>Apartment</h4>
+          <p><strong>Title:</strong> {{ selectedReservation.apartment_title || selectedReservation.title }}</p>
+          <p><strong>Address:</strong> {{ selectedReservation.apartment_address || selectedReservation.address }}</p>
+          <p><strong>City:</strong> {{ selectedReservation.city || 'Unknown city' }}</p>
+          <p><strong>Country:</strong> {{ selectedReservation.country || 'Tunisia' }}</p>
+          <p><strong>Price:</strong> {{ selectedReservation.apartment_price || selectedReservation.price || 0 }} TND</p>
+        </div>
+
+        <div class="info-card">
+          <h4>Renter</h4>
+          <p><strong>Name:</strong> {{ selectedReservation.renter_name || 'Unknown user' }}</p>
+          <p><strong>Email:</strong> {{ selectedReservation.renter_email || 'Not provided' }}</p>
+          <p><strong>Renter ID:</strong> {{ selectedReservation.renter_id || 'Unknown' }}</p>
+        </div>
+
+        <div class="info-card full-width">
+          <h4>Booking dates</h4>
+          <p><strong>Check-in:</strong> {{ selectedReservation.start_date | date:'fullDate' }}</p>
+          <p><strong>Check-out:</strong> {{ selectedReservation.end_date | date:'fullDate' }}</p>
+          <p><strong>Reservation ID:</strong> {{ selectedReservation.id }}</p>
+        </div>
+      </div>
+
+      <div class="reservation-detail-image" *ngIf="selectedReservation.cover_image">
+        <img [src]="selectedReservation.cover_image" [alt]="selectedReservation.apartment_title || selectedReservation.title" />
+      </div>
     </div>
   </div>
 </div>

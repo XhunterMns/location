@@ -2,11 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IonContent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -18,6 +19,8 @@ export class ProfileComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   currentRole = 'user';
+  showCurrentPassword = false;
+  showNewPassword = false;
 
   profileForm = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),

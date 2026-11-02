@@ -8,10 +8,17 @@ import { LandlordComponent } from './pages/landlord/landlord.component';
 import { AddLocalComponent } from './pages/landlord/add-local.component';
 import { RenterComponent } from './pages/renter/renter.component';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { AgencyRegisterComponent } from './pages/agency/agency-register.component';
+import { AgencyDashboardComponent } from './pages/agency/agency-dashboard.component';
+import { AgencyProfileComponent } from './pages/agency/agency-profile.component';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
-     {
-        path: '', redirectTo: '/login', pathMatch: 'full'
+    {
+        path: '', component: HomeComponent
+    },
+    {
+        path: 'home', component: HomeComponent
     },
     {
         path: 'login', component: LoginComponent
@@ -33,5 +40,14 @@ export const routes: Routes = [
     },
     {
         path: 'renter', component: RenterComponent, canActivate: [renterGuard]
+    },
+    {
+        path: 'agency/register', component: AgencyRegisterComponent, canActivate: [authGuard]
+    },
+    {
+        path: 'agency/dashboard', component: AgencyDashboardComponent, canActivate: [authGuard]
+    },
+    {
+        path: 'agency/:slug', component: AgencyProfileComponent
     },
 ];

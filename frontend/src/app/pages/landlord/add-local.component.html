@@ -1,107 +1,109 @@
-<div class="add-local-screen">
-  <div class="modal-backdrop" (click)="close()"></div>
+<ion-content class="ion-padding">
+  <div class="add-local-screen">
+    <div class="modal-backdrop" (click)="close()"></div>
 
-  <div class="add-local-modal" role="dialog" aria-modal="true" aria-labelledby="add-local-title">
-    <button class="close-btn" type="button" (click)="close()" aria-label="Close">×</button>
+    <div class="add-local-modal" role="dialog" aria-modal="true" aria-labelledby="add-local-title">
+      <button class="close-btn" type="button" (click)="close()" aria-label="Close">×</button>
 
-    <div class="card-title">
-      <p class="section-kicker">New listing</p>
-      <h1 id="add-local-title">Add a property</h1>
-      <span>Create a polished listing for your next rental opportunity.</span>
+      <div class="card-title">
+        <p class="section-kicker">New listing</p>
+        <h1 id="add-local-title" class="font-display">Add a property</h1>
+        <span>Create a clear listing with location, pricing, photos, and lease details.</span>
+      </div>
+
+      <form [formGroup]="localForm" (ngSubmit)="submit()" class="form-group">
+        <div class="input-box">
+          <label>Title</label>
+          <input formControlName="title" placeholder="Enter property title" />
+        </div>
+
+        <div class="input-box">
+          <label>Address</label>
+          <input formControlName="address" placeholder="Enter full address" />
+        </div>
+
+        <div class="input-box">
+          <label>City</label>
+          <select formControlName="city" class="custom-select">
+            <option *ngFor="let city of tunisianCities" [value]="city">{{ city }}</option>
+          </select>
+        </div>
+
+        <div class="input-box">
+          <label>Delegation</label>
+          <input formControlName="delegation" placeholder="Example: La Goulette, Sidi Bouzid, etc." />
+        </div>
+
+        <div class="input-box">
+          <label>Country</label>
+          <input formControlName="country" placeholder="Tunisia" />
+        </div>
+
+        <div class="input-box">
+          <label>Phone number</label>
+          <input formControlName="phone_number" placeholder="+216 22 123 456" />
+        </div>
+
+        <div class="input-box">
+          <label>Description</label>
+          <textarea formControlName="description" placeholder="Describe the property, amenities and lifestyle" rows="4"></textarea>
+        </div>
+
+        <div class="input-box">
+          <label>Price (TND)</label>
+          <input type="number" formControlName="price" placeholder="Enter monthly rent" />
+        </div>
+
+        <div class="toggle-box">
+          <label class="toggle-row">
+            <input type="checkbox" formControlName="is_colocation" />
+            <span>This is a colocation listing</span>
+          </label>
+        </div>
+
+        <div class="colocation-panel" *ngIf="localForm.get('is_colocation')?.value">
+          <div class="input-box">
+            <label>Room type</label>
+            <select formControlName="room_type" class="custom-select">
+              <option value="private room">Private room</option>
+              <option value="shared room">Shared room</option>
+              <option value="studio">Studio</option>
+            </select>
+          </div>
+
+          <div class="input-box">
+            <label>Available places</label>
+            <input type="number" formControlName="available_places" min="1" placeholder="1" />
+          </div>
+
+          <div class="input-box">
+            <label>Gender preference</label>
+            <select formControlName="gender_preference" class="custom-select">
+              <option value="no preference">No preference</option>
+              <option value="women only">Women only</option>
+              <option value="men only">Men only</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+
+          <div class="input-box">
+            <label>Colocation rules</label>
+            <textarea formControlName="colocation_rules" rows="3" placeholder="Example: no smoking, quiet hours, shared kitchen, pets allowed..."></textarea>
+          </div>
+        </div>
+
+        <div class="upload-box">
+          <label>Upload images</label>
+          <input type="file" (change)="onFilesSelected($event)" multiple accept="image/*" />
+          <small *ngIf="selectedFiles.length">{{ selectedFiles.length }} image(s) selected</small>
+          <small *ngIf="uploadError" class="error-text">{{ uploadError }}</small>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="secondary-btn" (click)="close()">Cancel</button>
+          <button type="submit" class="primary-btn">Create listing</button>
+        </div>
+      </form>
     </div>
-
-    <form [formGroup]="localForm" (ngSubmit)="submit()" class="form-group">
-      <div class="input-box">
-        <label>Title</label>
-        <input formControlName="title" placeholder="Enter property title" />
-      </div>
-
-      <div class="input-box">
-        <label>Address</label>
-        <input formControlName="address" placeholder="Enter full address" />
-      </div>
-
-      <div class="input-box">
-        <label>City</label>
-        <select formControlName="city" class="custom-select">
-          <option *ngFor="let city of tunisianCities" [value]="city">{{ city }}</option>
-        </select>
-      </div>
-
-      <div class="input-box">
-        <label>Delegation</label>
-        <input formControlName="delegation" placeholder="Example: La Goulette, Sidi Bouzid, etc." />
-      </div>
-
-      <div class="input-box">
-        <label>Country</label>
-        <input formControlName="country" placeholder="Tunisia" />
-      </div>
-
-      <div class="input-box">
-        <label>Phone number</label>
-        <input formControlName="phone_number" placeholder="+216 22 123 456" />
-      </div>
-
-      <div class="input-box">
-        <label>Description</label>
-        <textarea formControlName="description" placeholder="Describe the property, amenities and lifestyle" rows="4"></textarea>
-      </div>
-
-      <div class="input-box">
-        <label>Price (TND)</label>
-        <input type="number" formControlName="price" placeholder="Enter monthly rent" />
-      </div>
-
-      <div class="toggle-box">
-        <label class="toggle-row">
-          <input type="checkbox" formControlName="is_colocation" />
-          <span>This is a colocation listing</span>
-        </label>
-      </div>
-
-      <div class="colocation-panel" *ngIf="localForm.get('is_colocation')?.value">
-        <div class="input-box">
-          <label>Room type</label>
-          <select formControlName="room_type" class="custom-select">
-            <option value="private room">Private room</option>
-            <option value="shared room">Shared room</option>
-            <option value="studio">Studio</option>
-          </select>
-        </div>
-
-        <div class="input-box">
-          <label>Available places</label>
-          <input type="number" formControlName="available_places" min="1" placeholder="1" />
-        </div>
-
-        <div class="input-box">
-          <label>Gender preference</label>
-          <select formControlName="gender_preference" class="custom-select">
-            <option value="no preference">No preference</option>
-            <option value="women only">Women only</option>
-            <option value="men only">Men only</option>
-            <option value="mixed">Mixed</option>
-          </select>
-        </div>
-
-        <div class="input-box">
-          <label>Colocation rules</label>
-          <textarea formControlName="colocation_rules" rows="3" placeholder="Example: no smoking, quiet hours, shared kitchen, pets allowed..."></textarea>
-        </div>
-      </div>
-
-      <div class="upload-box">
-        <label>Upload images</label>
-        <input type="file" (change)="onFilesSelected($event)" multiple accept="image/*" />
-        <small *ngIf="selectedFiles.length">{{ selectedFiles.length }} image(s) selected</small>
-        <small *ngIf="uploadError" class="error-text">{{ uploadError }}</small>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="secondary-btn" (click)="close()">Cancel</button>
-        <button type="submit" class="primary-btn">Create listing</button>
-      </div>
-    </form>
   </div>
-</div>
+</ion-content>

@@ -28,6 +28,43 @@ async function getReservationsByUserId(userId) {
   return rows;
 }
 
+async function getReservationsByOwnerId(ownerId) {
+  const [rows] = await pool.query(
+    `
+      SELECT
+        r.id,
+        r.user_id AS renter_id,
+        r.local_id,
+        r.startDate AS start_date,
+        r.endDate AS end_date,
+        r.status,
+        u.name AS renter_name,
+        u.email AS renter_email,
+        l.title AS apartment_title,
+        l.address AS apartment_address,
+        l.city,
+        l.country,
+        l.price AS apartment_price,
+        l.description AS apartment_description,
+        (
+          SELECT li.image_url
+          FROM local_images li
+          WHERE li.local_id = l.id
+          ORDER BY li.id DESC
+          LIMIT 1
+        ) AS cover_image
+      FROM reservations r
+      INNER JOIN locals l ON l.id = r.local_id
+      INNER JOIN users u ON u.id = r.user_id
+      WHERE l.user_id = ?
+      ORDER BY r.id DESC
+    `,
+    [ownerId]
+  );
+
+  return rows;
+}
+
 async function getReservationById(id) {
   const [rows] = await pool.query('SELECT * FROM reservations WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
@@ -102,6 +139,7 @@ async function findLocalReservationForUser(localId, userId) {
 
 module.exports = {
   getReservationsByUserId,
+  getReservationsByOwnerId,
   getReservationById,
   getReservationByLocalAndUser,
   findReservationOverlap,

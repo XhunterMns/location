@@ -24,7 +24,7 @@ function handleControllerError(res, error) {
 
 async function createLocal(req, res) {
   try {
-    const payload = await createProperty({ userId: req.user.id, payload: req.body || {} });
+    const payload = await createProperty({ userId: req.user.id, user: req.user, payload: req.body || {} });
     return res.status(201).json(payload);
   } catch (error) {
     return handleControllerError(res, error);
@@ -33,7 +33,7 @@ async function createLocal(req, res) {
 
 async function getMyLocals(req, res) {
   try {
-    const payload = await getMyProperties(req.user.id);
+    const payload = await getMyProperties({ userId: req.user.id, user: req.user });
     return res.json(payload);
   } catch (error) {
     return handleControllerError(res, error);
@@ -42,7 +42,7 @@ async function getMyLocals(req, res) {
 
 async function updateLocal(req, res) {
   try {
-    const payload = await updateProperty({ userId: req.user.id, localId: req.params.id, payload: req.body || {} });
+    const payload = await updateProperty({ userId: req.user.id, user: req.user, localId: req.params.id, payload: req.body || {} });
     return res.json(payload);
   } catch (error) {
     return handleControllerError(res, error);
@@ -51,7 +51,7 @@ async function updateLocal(req, res) {
 
 async function deleteLocal(req, res) {
   try {
-    const payload = await deleteProperty({ userId: req.user.id, localId: req.params.id });
+    const payload = await deleteProperty({ userId: req.user.id, user: req.user, localId: req.params.id });
     return res.json(payload);
   } catch (error) {
     return handleControllerError(res, error);
@@ -78,7 +78,7 @@ async function getPublicImages(req, res) {
 
 async function getOwnerImages(req, res) {
   try {
-    const payload = await getPropertyImagesForOwner({ userId: req.user.id, localId: req.params.id });
+    const payload = await getPropertyImagesForOwner({ userId: req.user.id, user: req.user, localId: req.params.id });
     return res.json(payload);
   } catch (error) {
     return handleControllerError(res, error);
@@ -89,6 +89,7 @@ async function uploadImages(req, res) {
   try {
     const payload = await uploadPropertyImages({
       userId: req.user.id,
+      user: req.user,
       localId: req.params.id,
       images: Array.isArray(req.body?.images) ? req.body.images : [],
     });
@@ -102,6 +103,7 @@ async function uploadBinaryImage(req, res) {
   try {
     const payload = await uploadPropertyImageBinary({
       userId: req.user.id,
+      user: req.user,
       localId: req.params.id,
       mimeType: String(req.headers['x-image-mime'] || 'image/jpeg'),
       buffer: req.body,

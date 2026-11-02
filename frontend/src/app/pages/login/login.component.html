@@ -1,49 +1,84 @@
-<div class="auth-shell">
-  <div class="auth-visual" aria-hidden="true">
-    <div class="brand-block">
-      <span class="eyebrow">Premium rentals</span>
-      <h1>Find the next place that feels like home.</h1>
-      <p>Browse verified properties, book with confidence, and manage your rental journey in one trusted platform.</p>
-    </div>
-
-    <ul class="feature-list">
-      <li>Verified homes and local owners</li>
-      <li>Simple reservation workflow</li>
-      <li>Reliable landlord communication</li>
-    </ul>
-  </div>
-
-  <div class="auth-panel" @fade>
-    <div class="panel-header">
-      <div class="mini-logo">
-        <span>L</span>
+<div class="auth-page">
+  <div class="auth-shell">
+    <div class="auth-visual" aria-hidden="true">
+      <div class="brand-block">
+        <span class="eyebrow on-dark">Premium rentals</span>
+        <h1>Welcome back to Location.</h1>
+        <p>Sign in to manage reservations, listings, and agency workflows from one workspace.</p>
       </div>
-      <p class="eyebrow subtle">Welcome back</p>
-      <h2>Sign in</h2>
+
+      <ul class="feature-list">
+        <li>Role-aware dashboards for renters, landlords, and agencies</li>
+        <li>Clear reservation and approval flow</li>
+        <li>Secure account access with your credentials</li>
+      </ul>
     </div>
 
-    <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <label class="field">
-        <span>Email address</span>
-        <input name="email" type="email" formControlName="email" placeholder="you@example.com">
-      </label>
+    <div class="auth-panel">
+      <div class="panel-header">
+        <div class="mini-logo" aria-hidden="true"><span>L</span></div>
+        <p class="eyebrow">Welcome back</p>
+        <h2 class="panel-title">Sign in</h2>
+      </div>
 
-      <label class="field">
-        <span>Password</span>
-        <input type="password" formControlName="password" placeholder="Enter your password">
-      </label>
-
-      <div class="options-row">
-        <label class="checkbox-row">
-          <input type="checkbox">
-          <span>Remember me</span>
+      <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <label class="field">
+          <span>Email address</span>
+          <input
+            name="email"
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            [attr.aria-invalid]="submitted && loginForm.controls.email.invalid"
+          />
+          <span class="field-error" *ngIf="submitted && loginForm.controls.email.invalid">
+            Enter a valid email address.
+          </span>
         </label>
-        <a href="#">Forgot password?</a>
-      </div>
 
-      <button type="submit" class="primary-btn">Login</button>
-    </form>
+        <label class="field password-field">
+          <span>Password</span>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            [attr.aria-invalid]="submitted && loginForm.controls.password.invalid"
+          />
+          <button
+            class="password-toggle"
+            type="button"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            <svg *ngIf="!showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg *ngIf="showPassword" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M3 3l18 18M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4M9.9 5.1A10.5 10.5 0 0 1 12 5c6.5 0 10 7 10 7a18.4 18.4 0 0 1-4.2 4.8M6.1 6.1C3.9 7.7 2 12 2 12a18.5 18.5 0 0 0 6.4 5.5"/>
+            </svg>
+          </button>
+          <span class="field-error" *ngIf="submitted && loginForm.controls.password.invalid">
+            Password is required.
+          </span>
+        </label>
 
-    <p class="switch-copy">Need an account? <a routerLink="/signup">Create one</a></p>
+        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+        <div class="options-row">
+          <label class="checkbox-row">
+            <input type="checkbox" [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}" />
+            <span>Remember me</span>
+          </label>
+        </div>
+
+        <button type="submit" class="primary-btn" [disabled]="submitting">
+          {{ submitting ? 'Signing in…' : 'Sign in' }}
+        </button>
+      </form>
+
+      <p class="switch-copy">Need an account? <a routerLink="/signup">Create one</a></p>
+    </div>
   </div>
 </div>

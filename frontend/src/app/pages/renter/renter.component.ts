@@ -4,11 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RenterService } from '../../users/renter.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-renter',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IonContent],
   templateUrl: './renter.component.html',
   styleUrl: './renter.component.css'
 })
@@ -125,7 +126,7 @@ export class RenterComponent {
         this.loading = false;
       },
       error: (err) => {
-        this.pageError = err?.error?.message || 'Unable to load available locals.';
+        this.pageError = this.describeLoadError(err, 'Unable to load available locals.');
         this.loading = false;
       }
     });
@@ -136,9 +137,16 @@ export class RenterComponent {
       },
       error: (err) => {
         this.reservations = [];
-        this.reservationsError = err?.error?.message || 'Unable to load reservations.';
+        this.reservationsError = this.describeLoadError(err, 'Unable to load reservations.');
       }
     });
+  }
+
+  private describeLoadError(err: any, fallback: string): string {
+    if (err?.status === 429) {
+      return 'Too many requests right now. Wait a moment, then retry.';
+    }
+    return err?.error?.message || fallback;
   }
 
   view(local: any) {

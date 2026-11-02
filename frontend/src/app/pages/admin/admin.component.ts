@@ -5,11 +5,12 @@ import { Router } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { IonContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IonContent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -21,7 +22,9 @@ export class AdminComponent implements OnInit {
 
   users: any[] = [];
   locals: any[] = [];
-  activeTab: 'locals' | 'users' = 'locals';
+  agencies: any[] = [];
+  plans: any[] = [];
+  activeTab: 'locals' | 'users' | 'agencies' | 'plans' = 'locals';
   loading = false;
   errorMessage = '';
   searchTerm = '';
@@ -74,12 +77,16 @@ export class AdminComponent implements OnInit {
     
     forkJoin({
       users: this.adminService.getUsers(),
-      locals: this.adminService.getLocals()
+      locals: this.adminService.getLocals(),
+      agencies: this.adminService.getAgencies(),
+      plans: this.adminService.getPlans()
     }).subscribe({
       next: (results) => {
         console.log('Admin data loaded successfully:', results);
         this.users = Array.isArray(results.users) ? results.users : [];
         this.locals = Array.isArray(results.locals) ? results.locals : [];
+        this.agencies = Array.isArray(results.agencies) ? results.agencies : [];
+        this.plans = Array.isArray(results.plans) ? results.plans : [];
         this.loading = false;
       },
       error: (err) => {
@@ -90,7 +97,7 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'locals' | 'users') {
+  setTab(tab: 'locals' | 'users' | 'agencies' | 'plans') {
     this.activeTab = tab;
   }
 
@@ -131,6 +138,18 @@ export class AdminComponent implements OnInit {
     if (confirm('Are you sure you want to delete this user?')) {
       this.adminService.deleteUser(id).subscribe(() => this.loadData());
     }
+  }
+
+  approveAgency(id: number) {
+    this.adminService.reviewAgency(id, 'approved').subscribe(() => this.loadData());
+  }
+
+  rejectAgency(id: number) {
+    this.adminService.reviewAgency(id, 'rejected').subscribe(() => this.loadData());
+  }
+
+  activateSubscription(id: number, planKey: string) {
+    this.adminService.activateSubscription(id, { plan_key: planKey }).subscribe(() => this.loadData());
   }
 
   public logout() {

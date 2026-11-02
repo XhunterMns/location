@@ -1,15 +1,26 @@
 const mysql = require('mysql2/promise');
 const { DB_CONFIG } = require('../config/app.config');
 
+console.log('[DB] Creating MySQL pool with config:', {
+  host: DB_CONFIG.host,
+  port: DB_CONFIG.port,
+  database: DB_CONFIG.database,
+  user: DB_CONFIG.user,
+  sslEnabled: !!DB_CONFIG.ssl,
+  rejectUnauthorized: DB_CONFIG.ssl ? DB_CONFIG.ssl.rejectUnauthorized : undefined,
+});
+
 const pool = mysql.createPool(DB_CONFIG);
 
 async function ensureTable(sql, label) {
   try {
+    console.log(`[DB] Checking/creating ${label} table...`);
     const connection = await pool.getConnection();
     await connection.execute(sql);
     connection.release();
+    console.log(`[DB] ${label} table ready.`);
   } catch (error) {
-    console.error(`Error creating ${label} table:`, error);
+    console.error(`[DB] Error creating ${label} table:`, error);
     throw error;
   }
 }
@@ -160,12 +171,19 @@ async function detectUserColumn(tableName, targetKey, fallback = 'renter_id') {
 }
 
 async function ensureDatabaseSchema() {
-  await ensureLocalsTable();
-  await ensureLocalImagesTable();
-  await ensureReservationsTable();
-  await ensureEvaluationsTable();
-  await ensureNotificationsTable();
-  return { schemaReady: true };
+  console.log('[DB] Starting schema bootstrap...');
+  try {
+    await ensureLocalsTable();
+    await ensureLocalImagesTable();
+    await ensureReservationsTable();
+    await ensureEvaluationsTable();
+    await ensureNotificationsTable();
+    console.log('[DB] Schema bootstrap completed successfully.');
+    return { schemaReady: true };
+  } catch (error) {
+    console.error('[DB] Schema bootstrap failed:', error);
+    throw error;
+  }
 }
 
 module.exports = {

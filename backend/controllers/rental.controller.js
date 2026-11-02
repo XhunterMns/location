@@ -1,5 +1,6 @@
 const {
   getMyReservations,
+  getOwnerReservations,
   createRentalRequest,
   deleteRentalRequest,
   addEvaluation,
@@ -31,6 +32,15 @@ async function createReservation(req, res) {
   }
 }
 
+async function listOwnerReservations(req, res) {
+  try {
+    const payload = await getOwnerReservations(req.user.id);
+    return res.json(payload);
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
 async function deleteReservation(req, res) {
   try {
     const payload = await deleteRentalRequest({ userId: req.user.id, reservationId: req.params.id });
@@ -51,6 +61,7 @@ async function createEvaluation(req, res) {
 
 module.exports = {
   listMyReservations,
+  listOwnerReservations,
   createReservation,
   deleteReservation,
   createEvaluation,

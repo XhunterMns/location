@@ -1,0 +1,98 @@
+<div class="agency-dashboard">
+  <header class="dashboard-header panel-surface">
+    <div>
+      <p class="section-kicker">Agency workspace</p>
+      <h1 class="font-display">Agency dashboard</h1>
+      <p class="lead-copy">Monitor listings, subscription status, inquiries, and team members.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/agency/register" class="secondary-btn">Register agency</a>
+      <button class="outline-btn" type="button" (click)="logout()">Log out</button>
+    </div>
+  </header>
+
+  <div *ngIf="loading" class="loading-state">Loading agency information…</div>
+
+  <div *ngIf="!loading && dashboard?.agency; else noAgency" class="stats-grid">
+    <div class="metric-card panel-surface">
+      <span>Agency</span>
+      <strong>{{ dashboard.agency.name }}</strong>
+    </div>
+    <div class="metric-card panel-surface">
+      <span>Plan</span>
+      <strong>{{ dashboard.agency.subscription_plan || 'free' }}</strong>
+    </div>
+    <div class="metric-card panel-surface">
+      <span>Listings</span>
+      <strong>{{ dashboard.listing_count }}</strong>
+    </div>
+    <div class="metric-card panel-surface">
+      <span>Members</span>
+      <strong>{{ dashboard.members?.length || 0 }}</strong>
+    </div>
+  </div>
+
+  <ng-template #noAgency>
+    <div class="panel panel-surface empty-state" *ngIf="!loading">
+      <h3>No agency found</h3>
+      <p>Create an agency before accessing the dashboard.</p>
+      <a routerLink="/agency/register" class="primary-btn">Create agency</a>
+    </div>
+  </ng-template>
+
+  <div *ngIf="!loading && dashboard?.agency" class="panel-grid">
+    <section class="panel panel-surface">
+      <p class="section-kicker">Profile</p>
+      <h2>Agency information</h2>
+      <dl class="detail-list">
+        <div><dt>Name</dt><dd>{{ dashboard.agency.name }}</dd></div>
+        <div><dt>Email</dt><dd>{{ dashboard.agency.business_email }}</dd></div>
+        <div><dt>Phone</dt><dd>{{ dashboard.agency.phone }}</dd></div>
+        <div><dt>City</dt><dd>{{ dashboard.agency.city }}</dd></div>
+        <div><dt>Status</dt><dd><span class="status-badge" [ngClass]="dashboard.agency.status === 'approved' ? 'active' : 'reserved'">{{ dashboard.agency.status }}</span></dd></div>
+        <div><dt>Verification</dt><dd>{{ dashboard.agency.is_verified ? 'Approved' : 'Pending' }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel panel-surface">
+      <p class="section-kicker">Billing</p>
+      <h2>Subscription</h2>
+      <dl class="detail-list">
+        <div><dt>Plan</dt><dd>{{ dashboard.agency.subscription_plan || 'free' }}</dd></div>
+        <div><dt>Status</dt><dd>{{ dashboard.agency.subscription_status || 'manual_review' }}</dd></div>
+        <div><dt>Expires</dt><dd>{{ dashboard.agency.subscription_expires_at || 'Not set' }}</dd></div>
+      </dl>
+    </section>
+  </div>
+
+  <div *ngIf="!loading && dashboard?.agency" class="panel-grid">
+    <section class="panel panel-surface">
+      <p class="section-kicker">Inbox</p>
+      <h2>Incoming inquiries</h2>
+      <ul class="item-list" *ngIf="dashboard.inquiries?.length; else noInquiries">
+        <li *ngFor="let item of dashboard.inquiries">
+          <strong>{{ item.sender_name }}</strong>
+          <span>{{ item.sender_email }}</span>
+          <p>{{ item.message }}</p>
+        </li>
+      </ul>
+      <ng-template #noInquiries>
+        <div class="empty-state compact"><p>No incoming messages yet.</p></div>
+      </ng-template>
+    </section>
+
+    <section class="panel panel-surface">
+      <p class="section-kicker">Team</p>
+      <h2>Members</h2>
+      <ul class="item-list" *ngIf="dashboard.members?.length; else noMembers">
+        <li *ngFor="let member of dashboard.members">
+          <strong>{{ member.name }}</strong>
+          <span class="type-tag neutral">{{ member.role }}</span>
+        </li>
+      </ul>
+      <ng-template #noMembers>
+        <div class="empty-state compact"><p>No team members yet.</p></div>
+      </ng-template>
+    </section>
+  </div>
+</div>

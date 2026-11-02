@@ -21,7 +21,19 @@ function loadEnvFile(filePath) {
   }
 }
 
-loadEnvFile(path.resolve(__dirname, '../.env'));
+const envFiles = [
+  '/etc/secrets/.env',
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(__dirname, '../.env'),
+];
+
+for (const envFile of envFiles) {
+  loadEnvFile(envFile);
+}
+
+for (const envFile of envFiles) {
+  loadEnvFile(envFile);
+}
 
 module.exports = {
   env: process.env,

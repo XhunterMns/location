@@ -1,5 +1,5 @@
 import { Component, inject, ViewEncapsulation } from '@angular/core';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -12,7 +12,7 @@ interface NavItem {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   encapsulation: ViewEncapsulation.None
@@ -34,6 +34,16 @@ export class AppComponent {
       { label: 'Dashboard', route: '/landlord', icon: '▣' },
       { label: 'My Listings', route: '/landlord', icon: '🏡' },
       { label: 'Add Local', route: '/landlord/add', icon: '＋' },
+      { label: 'Agency', route: '/agency/register', icon: '🏢' },
+      { label: 'Profile', route: '/profile', icon: '👤' }
+    ],
+    agency_owner: [
+      { label: 'Agency Dashboard', route: '/agency/dashboard', icon: '▣' },
+      { label: 'Register Agency', route: '/agency/register', icon: '🏢' },
+      { label: 'Profile', route: '/profile', icon: '👤' }
+    ],
+    agency_agent: [
+      { label: 'Agency Dashboard', route: '/agency/dashboard', icon: '▣' },
       { label: 'Profile', route: '/profile', icon: '👤' }
     ],
     renter: [
@@ -62,13 +72,16 @@ export class AppComponent {
     return this.headerItems;
   }
 
+  private isPublicRoute(): boolean {
+    const url = this.router.url || '/';
+    return url === '/' || url === '/login' || url === '/signup' || url.startsWith('/login?') || url.startsWith('/signup?');
+  }
+
   showAppLayout(): boolean {
-    return this.authService.isLoggedIn() &&
-      !this.router.url.includes('/login') &&
-      !this.router.url.includes('/signup');
+    return !this.isPublicRoute() && this.authService.isLoggedIn();
   }
 
   showBrandHeader(): boolean {
-    return !this.router.url.includes('/login') || !this.router.url.includes('/signup');
+    return true;
   }
 }
