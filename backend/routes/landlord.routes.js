@@ -1,6 +1,7 @@
 const express = require('express');
 const propertyController = require('../controllers/property.controller');
 const notificationController = require('../controllers/notification.controller');
+const rentalController = require('../controllers/rental.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const { requireRole } = require('../middleware/role.middleware');
 
@@ -20,5 +21,7 @@ router.post(
 );
 router.get('/locals/:id/images', verifyToken, requireRole('landlord'), propertyController.getOwnerImages);
 router.get('/notifications', verifyToken, requireRole('landlord'), notificationController.listMyNotifications);
+router.get('/reservations', verifyToken, requireRole('landlord'), rentalController.listLandlordReservations);
+router.patch('/reservations/:id/refuse', verifyToken, requireRole('landlord'), rentalController.refuseReservation);
 
 module.exports = router;

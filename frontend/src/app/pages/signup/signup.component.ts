@@ -5,6 +5,10 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
+
+const PASSWORD_REQUIREMENTS =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])\S{8,}$/;
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -32,28 +36,30 @@ import { trigger, transition, style, animate } from '@angular/animations';
 export class SignupComponent {
 authService  =  inject(AuthService);
 router  =  inject(Router);
+readonly maxBirthDate = new Date().toISOString().slice(0, 10);
 
   public signupForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
+    birthDate: new FormControl('', [Validators.required]),
+    password: new FormControl('', [
+      Validators.required,
+      Validators.pattern(PASSWORD_REQUIREMENTS),
+    ]),
     role: new FormControl('', [Validators.required]),
   })
 
-    public onSubmit() {
+  public onSubmit() {
+    this.signupForm.markAllAsTouched();
+
     if (this.signupForm.valid) {
-      console.log(this.signupForm.value);
       this.authService.signup(this.signupForm.value)
         .subscribe({
-          next: (data: any) => {
-            console.log(data);
+          next: () => {
             this.router.navigate(['/login']);
           },
-          error: (err) => console.log(err)
+          error: (err) => console.error('Signup failed', err)
         });
     }
-    console.log(this.signupForm.valid);
-    
   }
-  
 }

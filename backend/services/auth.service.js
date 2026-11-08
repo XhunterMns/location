@@ -3,20 +3,24 @@ const jwt = require('jsonwebtoken');
 const { APP_CONFIG } = require('../config/app.config');
 const { createUser, findUserByEmail, ensureAdminUser } = require('../repositories/users.repository');
 const { normalizeRole } = require('../utils/api-response');
+const { validateRegistration } = require('../validators/auth.validator');
 
-async function registerUser({ name, email, password, role }) {
+async function registerUser({ name, email, password, birthDate, role }) {
   const normalizedRole = normalizeRole(role);
+  const validation = validateRegistration({ name, email, password, birthDate, role });
 
-  if (!email || !password || !normalizedRole) {
-    throw Object.assign(new Error('Missing fields'), { statusCode: 400 });
-  }
-
-  if (!['landlord', 'renter'].includes(normalizedRole)) {
-    throw Object.assign(new Error('Invalid role'), { statusCode: 400 });
+  if (!validation.valid) {
+    throw Object.assign(new Error(validation.message), { statusCode: 400 });
   }
 
   const hashedPassword = await bcrypt.hash(password, APP_CONFIG.bcryptRounds);
-  const user = await createUser({ name, email, password: hashedPassword, role: normalizedRole });
+  const user = await createUser({
+    name,
+    email,
+    birthDate,
+    password: hashedPassword,
+    role: normalizedRole,
+  });
 
   return { id: user.id, message: 'User created' };
 }

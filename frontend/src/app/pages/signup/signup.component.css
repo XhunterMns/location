@@ -170,6 +170,27 @@
   box-shadow: 0 0 0 4px rgba(15, 157, 138, 0.12);
 }
 
+.field-error,
+.password-hint {
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.password-hint {
+  color: var(--muted);
+}
+
+.field-error {
+  color: #b42318;
+}
+
+.primary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
 .primary-btn {
   border: none;
   border-radius: 1rem;

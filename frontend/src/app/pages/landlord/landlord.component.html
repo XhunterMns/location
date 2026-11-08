@@ -40,6 +40,37 @@
     </ng-template>
   </section>
 
+  <section class="notifications-panel panel-surface">
+    <div class="section-title-row">
+      <div>
+        <p class="section-kicker">Requests</p>
+        <h2>Reservation requests</h2>
+      </div>
+      <button type="button" class="refresh-btn" (click)="loadReservations()">Refresh</button>
+    </div>
+
+    <div class="notification-list" *ngIf="reservations.length; else noReservations">
+      <article class="notification-item" *ngFor="let reservation of reservations">
+        <div>
+          <strong>{{ reservation.renter_name || reservation.renter_email }}</strong>
+          <p>{{ reservation.title }} · {{ reservation.start_date | date:'mediumDate' }} to {{ reservation.end_date | date:'mediumDate' }}</p>
+          <small>Status: {{ reservation.status }}</small>
+        </div>
+        <button
+          type="button"
+          class="delete-btn"
+          *ngIf="reservation.status === 'reserved'"
+          (click)="refuseReservation(reservation.id)"
+        >
+          Refuse
+        </button>
+      </article>
+    </div>
+    <ng-template #noReservations>
+      <div class="empty-notifications"><p>No reservation requests yet.</p></div>
+    </ng-template>
+  </section>
+
   <section class="listings-panel panel-surface">
     <div class="section-title-row">
       <div>

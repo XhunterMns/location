@@ -10,10 +10,10 @@ async function findUserById(id) {
   return rows[0] || null;
 }
 
-async function createUser({ name, email, password, role }) {
+async function createUser({ name, email, birthDate, password, role }) {
   const [result] = await pool.query(
-    'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-    [name || null, email, password, role]
+    'INSERT INTO users (name, email, birth_date, password, role) VALUES (?, ?, ?, ?, ?)',
+    [name || null, email, birthDate || null, password, role]
   );
 
   return { id: result.insertId };

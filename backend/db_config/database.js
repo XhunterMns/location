@@ -14,6 +14,23 @@ async function ensureTable(sql, label) {
   }
 }
 
+async function ensureUsersTable() {
+  await ensureTable(
+    `
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) DEFAULT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        birth_date DATE DEFAULT NULL,
+        password VARCHAR(255) NOT NULL,
+        role VARCHAR(40) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `,
+    'users'
+  );
+}
+
 async function ensureLocalsTable() {
   await ensureTable(
     `
@@ -160,6 +177,13 @@ async function detectUserColumn(tableName, targetKey, fallback = 'renter_id') {
 }
 
 async function ensureDatabaseSchema() {
+  await ensureUsersTable();
+
+  const [birthDateColumn] = await pool.query("SHOW COLUMNS FROM users LIKE 'birth_date'");
+  if (birthDateColumn.length === 0) {
+    await pool.query('ALTER TABLE users ADD COLUMN birth_date DATE DEFAULT NULL');
+  }
+
   await ensureLocalsTable();
   await ensureLocalImagesTable();
   await ensureReservationsTable();

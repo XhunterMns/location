@@ -1,6 +1,6 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, inject, Inject, PLATFORM_ID } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RenterService } from '../../users/renter.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -32,15 +32,24 @@ export class RenterComponent {
   ];
   authService = inject(AuthService);
   router = inject(Router);
+  readonly minReservationDate = new Date().toISOString().slice(0, 10);
   reservationForm = new FormGroup({
     start_date: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     end_date: new FormControl('', { nonNullable: true, validators: [Validators.required] })
-  });
+  }, { validators: RenterComponent.dateRangeValidator });
 
   evaluationForm = new FormGroup({
     rating: new FormControl(5, { nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5)] }),
     comment: new FormControl('', { nonNullable: true })
   });
+
+  static dateRangeValidator(control: AbstractControl): ValidationErrors | null {
+    const startDate = control.get('start_date')?.value;
+    const endDate = control.get('end_date')?.value;
+
+    if (!startDate || !endDate) return null;
+    return endDate > startDate ? null : { invalidDateRange: true };
+  }
 
   constructor(
     private renterService: RenterService,
@@ -107,6 +116,13 @@ export class RenterComponent {
 
       return fields.some((value) => String(value ?? '').toLowerCase().includes(term));
     });
+  }
+
+  hasReservationForSelectedLocal(): boolean {
+    return Boolean(
+      this.selectedLocal &&
+      this.reservations.some((reservation) => Number(reservation.local_id) === Number(this.selectedLocal.id))
+    );
   }
 
   ngOnInit() {

@@ -31,11 +31,26 @@
       <label class="field">
         <span>Email address</span>
         <input type="email" name="email" placeholder="you@example.com" formControlName="email">
+        <small class="field-error" *ngIf="signupForm.controls.email.touched && signupForm.controls.email.invalid">
+          Enter a valid email address.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Date of birth</span>
+        <input type="date" name="birthDate" formControlName="birthDate" [max]="maxBirthDate">
+        <small class="field-error" *ngIf="signupForm.controls.birthDate.touched && signupForm.controls.birthDate.invalid">
+          Select your date of birth.
+        </small>
       </label>
 
       <label class="field">
         <span>Password</span>
         <input type="password" name="password" placeholder="Create a secure password" formControlName="password">
+        <small class="password-hint">At least 8 characters, including uppercase, lowercase, number, and special character.</small>
+        <small class="field-error" *ngIf="signupForm.controls.password.touched && signupForm.controls.password.invalid">
+          Use all password requirements above.
+        </small>
       </label>
 
       <label class="field">
@@ -47,7 +62,7 @@
         </select>
       </label>
 
-      <button type="submit" class="primary-btn">Create account</button>
+      <button type="submit" class="primary-btn" [disabled]="signupForm.invalid">Create account</button>
     </form>
 
     <p class="switch-copy">Already have an account? <a routerLink="/login">Sign in</a></p>

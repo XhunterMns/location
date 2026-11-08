@@ -1,1 +1,2 @@
-export const API_BASE_URL = 'https://location-production-8451.up.railway.app/api';
+// Nginx routes same-origin API requests to the backend service.
+export const API_BASE_URL = '/api';

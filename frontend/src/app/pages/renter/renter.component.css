@@ -76,3 +76,14 @@
 .danger-action:hover {
   transform: translateY(-1px);
 }
+.form-error {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.85rem;
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

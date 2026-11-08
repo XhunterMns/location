@@ -17,6 +17,7 @@ export class LandlordComponent {
 
   locals: any[] = [];
   notifications: any[] = [];
+  reservations: any[] = [];
   selectedLocal: any | null = null;
   editLocal: any = null;
   searchTerm = '';
@@ -46,6 +47,7 @@ export class LandlordComponent {
     if (!isPlatformBrowser(this.platformId)) return;
     this.loadLocals();
     this.loadNotifications();
+    this.loadReservations();
   }
 
   loadLocals() {
@@ -58,6 +60,17 @@ export class LandlordComponent {
     this.service.getNotifications().subscribe((res: any) => {
       this.notifications = Array.isArray(res) ? res : [];
     });
+  }
+
+  loadReservations() {
+    this.service.getReservations().subscribe({
+      next: (res: any) => this.reservations = Array.isArray(res) ? res : [],
+      error: () => this.reservations = []
+    });
+  }
+
+  refuseReservation(id: number) {
+    this.service.refuseReservation(id).subscribe(() => this.loadReservations());
   }
 
   delete(id: number) {

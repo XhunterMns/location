@@ -1,5 +1,7 @@
 const {
   getMyReservations,
+  getLandlordReservations,
+  rejectReservation,
   createRentalRequest,
   deleteRentalRequest,
   addEvaluation,
@@ -17,6 +19,25 @@ async function listMyReservations(req, res) {
   try {
     const payload = await getMyReservations(req.user.id);
     return res.json(payload);
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
+async function listLandlordReservations(req, res) {
+  try {
+    return res.json(await getLandlordReservations(req.user.id));
+  } catch (error) {
+    return handleControllerError(res, error);
+  }
+}
+
+async function refuseReservation(req, res) {
+  try {
+    return res.json(await rejectReservation({
+      landlordId: req.user.id,
+      reservationId: req.params.id,
+    }));
   } catch (error) {
     return handleControllerError(res, error);
   }
@@ -51,6 +72,8 @@ async function createEvaluation(req, res) {
 
 module.exports = {
   listMyReservations,
+  listLandlordReservations,
+  refuseReservation,
   createReservation,
   deleteReservation,
   createEvaluation,

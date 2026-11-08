@@ -28,6 +28,24 @@ async function getReservationsByUserId(userId) {
   return rows;
 }
 
+async function getReservationsByLandlordId(landlordId) {
+  const [rows] = await pool.query(
+    `
+      SELECT r.id, r.startDate AS start_date, r.endDate AS end_date, r.status,
+             r.local_id, l.title, l.address,
+             u.id AS renter_id, u.name AS renter_name, u.email AS renter_email
+      FROM reservations r
+      INNER JOIN locals l ON l.id = r.local_id
+      INNER JOIN users u ON u.id = r.user_id
+      WHERE l.user_id = ? AND r.status <> 'cancelled'
+      ORDER BY r.id DESC
+    `,
+    [landlordId]
+  );
+
+  return rows;
+}
+
 async function getReservationById(id) {
   const [rows] = await pool.query('SELECT * FROM reservations WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
@@ -76,6 +94,33 @@ async function deleteReservationById(id) {
   return { affectedRows: result.affectedRows };
 }
 
+async function cancelReservationByUserId(id, userId) {
+  const [result] = await pool.query(
+    `
+      UPDATE reservations
+      SET status = 'cancelled'
+      WHERE id = ? AND user_id = ? AND status = 'reserved'
+    `,
+    [id, userId]
+  );
+
+  return { affectedRows: result.affectedRows };
+}
+
+async function rejectReservationByLandlordId(id, landlordId) {
+  const [result] = await pool.query(
+    `
+      UPDATE reservations r
+      INNER JOIN locals l ON l.id = r.local_id
+      SET r.status = 'rejected'
+      WHERE r.id = ? AND l.user_id = ? AND r.status = 'reserved'
+    `,
+    [id, landlordId]
+  );
+
+  return { affectedRows: result.affectedRows };
+}
+
 async function saveEvaluation({ localId, userId, rating, comment }) {
   const [result] = await pool.query(
     `
@@ -93,7 +138,7 @@ async function saveEvaluation({ localId, userId, rating, comment }) {
 
 async function findLocalReservationForUser(localId, userId) {
   const [rows] = await pool.query(
-    'SELECT id FROM reservations WHERE local_id = ? AND user_id = ? LIMIT 1',
+    "SELECT id FROM reservations WHERE local_id = ? AND user_id = ? AND status = 'reserved' LIMIT 1",
     [localId, userId]
   );
 
@@ -102,11 +147,14 @@ async function findLocalReservationForUser(localId, userId) {
 
 module.exports = {
   getReservationsByUserId,
+  getReservationsByLandlordId,
   getReservationById,
   getReservationByLocalAndUser,
   findReservationOverlap,
   createReservation,
   deleteReservationById,
+  cancelReservationByUserId,
+  rejectReservationByLandlordId,
   saveEvaluation,
   findLocalReservationForUser,
 };

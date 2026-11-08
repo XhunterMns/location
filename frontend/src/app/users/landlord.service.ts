@@ -59,4 +59,12 @@ export class LandlordService {
   getNotifications() {
     return this.http.get(`${this.baseUrl}/notifications`, this.authHeaders());
   }
+
+  getReservations() {
+    return this.http.get(`${this.baseUrl}/reservations`, this.authHeaders());
+  }
+
+  refuseReservation(id: number) {
+    return this.http.patch(`${this.baseUrl}/reservations/${id}/refuse`, {}, this.authHeaders());
+  }
 }
